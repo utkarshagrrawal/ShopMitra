@@ -7,7 +7,7 @@ export function TrendingProducts() {
     <Carousel
       showIndicators={false}
       autoPlay={true}
-      interval={2400}
+      interval={3000}
       infiniteLoop={true}
       showThumbs={false}
       showStatus={false}
