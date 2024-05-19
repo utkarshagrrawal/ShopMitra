@@ -56,7 +56,7 @@ export default function SearchBar() {
         </div>
       </div>
       {isSearchResultVisible && (
-        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full h-48 px-2 transition ease-in-out">
+        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full h-48 px-2 transition ease-in-out z-10">
           <div className="">sdfsfs</div>
           <div className="">sdfsfs</div>
           <div className="">sdfsfs</div>

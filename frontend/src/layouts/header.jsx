@@ -6,7 +6,8 @@ import { OrdersIcon } from "../components/ordersIcon";
 import { FavouriteIcon } from "../components/favouriteIcon";
 
 export default function Header(props) {
-  const [isUserSignedIn, setIsUserSignedIn] = useState(true);
+  const [isUserSignedIn, setIsUserSignedIn] = useState(false);
+  const [userDetails, setUserDetails] = useState({});
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
 
@@ -16,6 +17,11 @@ export default function Header(props) {
     } else {
       setIsProfileDropdownOpen(true);
     }
+  };
+
+  const handleLogout = async () => {
+    localStorage.removeItem("token");
+    setIsUserSignedIn(false);
   };
 
   useEffect(() => {
@@ -30,6 +36,33 @@ export default function Header(props) {
     document.addEventListener("click", handleClickOutsideProfileDropdown);
     return () =>
       document.removeEventListener("click", handleClickOutsideProfileDropdown);
+  }, []);
+
+  useEffect(() => {
+    const isUserLoggedIn = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await fetch(
+          "http://localhost:3000/auth/is-logged-in",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          localStorage.removeItem("token");
+          setIsUserSignedIn(false);
+        } else {
+          setIsUserSignedIn(true);
+          setUserDetails(data.user);
+        }
+      }
+    };
+    isUserLoggedIn();
   }, []);
 
   return (
@@ -65,7 +98,7 @@ export default function Header(props) {
                 </svg>
               </div>
               <div
-                className={`absolute mr-44 top-[60px] bg-white border border-black rounded-lg w-48 h-auto duration-300 ${
+                className={`absolute mr-44 top-[60px] bg-white border border-black rounded-lg w-48 h-auto duration-300 z-10 ${
                   isProfileDropdownOpen ? "block" : "hidden"
                 }`}
               >
@@ -95,7 +128,10 @@ export default function Header(props) {
                     <OrdersIcon />
                     Orders
                   </button>
-                  <button className="w-full flex items-center h-12 px-4 gap-4">
+                  <button
+                    className="w-full flex items-center h-12 px-4 gap-4"
+                    onClick={handleLogout}
+                  >
                     <LogoutIcon />
                     Logout
                   </button>
@@ -103,7 +139,10 @@ export default function Header(props) {
               </div>
             </>
           ) : (
-            <button className="flex items-center gap-2 hover:cursor-pointer">
+            <button
+              className="flex items-center gap-2 hover:cursor-pointer"
+              onClick={() => (location.href = "/signin")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
