@@ -42,13 +42,16 @@ export function Signup() {
 
     setRegistering(true);
 
-    const response = await fetch("http://localhost:3000/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(signupDetails),
-    });
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signupDetails),
+      }
+    );
     const data = await response.json();
 
     setRegistering(false);

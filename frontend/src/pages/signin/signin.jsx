@@ -24,13 +24,16 @@ export function Signin() {
 
     setSigningIn(true);
 
-    const response = await fetch("http://localhost:3000/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginDetails),
-    });
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginDetails),
+      }
+    );
     const data = await response.json();
 
     setSigningIn(false);
@@ -49,7 +52,7 @@ export function Signin() {
       const token = localStorage.getItem("token");
       if (token) {
         const response = await fetch(
-          "http://localhost:3000/auth/is-logged-in",
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
           {
             method: "GET",
             headers: {
