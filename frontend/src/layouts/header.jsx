@@ -43,7 +43,7 @@ export default function Header(props) {
       const token = localStorage.getItem("token");
       if (token) {
         const response = await fetch(
-          "http://localhost:3000/auth/is-logged-in",
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
           {
             method: "GET",
             headers: {
