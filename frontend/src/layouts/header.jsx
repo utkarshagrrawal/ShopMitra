@@ -4,6 +4,7 @@ import { CartIcon } from "../components/cartIcon";
 import { LogoutIcon } from "../components/logoutIcon";
 import { OrdersIcon } from "../components/ordersIcon";
 import { FavouriteIcon } from "../components/favouriteIcon";
+import logo from "../assets/logo.png";
 
 export default function Header(props) {
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
@@ -67,7 +68,7 @@ export default function Header(props) {
 
   return (
     <div className="flex w-full justify-between items-center h-[60px] px-4 border-b">
-      <span className="text-2xl font-semibold text-black">Shopmitra</span>
+      <img src={logo} className="w-16 h-16 mix-blend-normal rounded-full" />
       <SearchBar />
       <div className="flex items-center gap-4">
         <div className="flex items-center">
