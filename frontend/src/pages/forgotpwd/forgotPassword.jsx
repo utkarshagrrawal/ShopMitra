@@ -87,6 +87,7 @@ export function ForgotPassword() {
         setLoading(false);
       } catch (err) {
         ErrorAlert(err.message);
+        setLoading(false);
       }
     }
   };
