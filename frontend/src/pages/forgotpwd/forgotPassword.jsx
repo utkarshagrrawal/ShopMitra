@@ -61,7 +61,9 @@ export function ForgotPassword() {
       }
     );
     const data = await response.json();
+
     if (data.error) {
+      setLoading(false);
       ErrorAlert(data.error);
     } else {
       const otpDigits = data.otp.split("");
@@ -86,8 +88,8 @@ export function ForgotPassword() {
         setEmailSent(true);
         setLoading(false);
       } catch (err) {
-        ErrorAlert(err.message);
         setLoading(false);
+        ErrorAlert(err.message);
       }
     }
   };
