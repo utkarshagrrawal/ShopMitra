@@ -2,6 +2,9 @@ const {
   loginLogic,
   registerLogic,
   userDetailsLogic,
+  generateOtpCodeLogic,
+  verifyOtpLogic,
+  resetPasswordLogic,
 } = require("../businessLogic/authLogic");
 
 const loginController = async (req, res) => {
@@ -31,4 +34,38 @@ const userDetailsController = async (req, res) => {
   }
 };
 
-module.exports = { loginController, registerController, userDetailsController };
+const generateOtpCode = async (req, res) => {
+  const user = await generateOtpCodeLogic(req.body);
+  if (user.error) {
+    return res.status(400).json({ error: user.error });
+  } else {
+    return res.status(200).json(user);
+  }
+};
+
+const verifyOtpCode = async (req, res) => {
+  const user = await verifyOtpLogic(req.body);
+  if (user.error) {
+    return res.status(400).json({ error: user.error });
+  } else {
+    return res.status(200).json(user);
+  }
+};
+
+const resetPasswordController = async (req, res) => {
+  const user = await resetPasswordLogic(req.body);
+  if (user.error) {
+    return res.status(400).json({ error: user.error });
+  } else {
+    return res.status(200).json(user);
+  }
+};
+
+module.exports = {
+  loginController,
+  registerController,
+  userDetailsController,
+  generateOtpCode,
+  verifyOtpCode,
+  resetPasswordController,
+};
