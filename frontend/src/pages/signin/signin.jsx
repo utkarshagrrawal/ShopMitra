@@ -76,7 +76,7 @@ export function Signin() {
   return (
     <div className="bg-gray-100 pt-4 flex flex-col min-h-screen items-center">
       <img src={logo} className="w-20 h-20 mix-blend-normal rounded-full" />
-      <main className="w-full max-w-md space-y-8">
+      <main className="w-full max-w-md space-y-8 px-4">
         <div>
           <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">
             Sign in to your account

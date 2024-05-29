@@ -6,6 +6,8 @@ import { Signup } from "./pages/signup/singup";
 import { Toaster } from "react-hot-toast";
 import { ForgotPassword } from "./pages/forgotpwd/forgotPassword";
 import { ResetPassword } from "./pages/forgotpwd/resetPassword";
+import { Profile } from "./pages/dashboard/profile";
+import { NotFound } from "./global/404";
 
 function App() {
   return (
@@ -17,7 +19,8 @@ function App() {
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route path="/resetpassword" element={<ResetPassword />}></Route>
-        <Route path="*" element={<h1>Not Found</h1>}></Route>
+        <Route path="/dashboard/:section" element={<Profile />}></Route>
+        <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </Router>
   );

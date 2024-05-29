@@ -1,26 +1,27 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const jwtVerify = async (token, rememberMe) => {
+const jwtVerify = async (token) => {
   if (token) {
     try {
-      return jwt.verify(token, process.env.APP_SECRET_KEY);
+      const payload = jwt.verify(token, process.env.APP_SECRET_KEY);
+      return { payload: payload };
     } catch (err) {
-      return err;
+      return { error: err };
     }
   } else {
-    return null;
+    return { error: "Token not found" };
   }
 };
 
-const authenticate = (req, res, next) => {
+const authenticate = async (req, res, next) => {
   const token = req.headers.authorization;
-  const decodedPayload = jwtVerify(token);
-  if (decodedPayload) {
+  const decodedPayload = await jwtVerify(token);
+  if (decodedPayload.error) {
+    res.status(401).json({ error: "Unauthorized" });
+  } else {
     req.user = decodedPayload;
     next();
-  } else {
-    res.status(401).json({ error: "Unauthorized" });
   }
 };
 

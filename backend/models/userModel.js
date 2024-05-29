@@ -44,6 +44,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  is_deleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const User = mongoose.model("User", userSchema);
