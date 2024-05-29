@@ -73,7 +73,7 @@ export function Signup() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen pt-4 flex flex-col items-center">
+    <div className="bg-gray-100 min-h-screen pt-4 flex flex-col items-center px-4">
       <img src={logo} className="w-20 h-20 mix-blend-normal rounded-full" />
       <div className="w-full max-w-md space-y-8">
         <div>

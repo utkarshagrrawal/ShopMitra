@@ -26,11 +26,11 @@ const registerController = async (req, res) => {
 };
 
 const userDetailsController = async (req, res) => {
-  const user = await userDetailsLogic(req.user);
+  const user = await userDetailsLogic(req.user.payload);
   if (user.error) {
     return res.status(400).json({ error: user.error });
   } else {
-    return res.status(200).json({ user: user.user });
+    return res.status(200).json(user);
   }
 };
 

@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const loginLogic = async (body) => {
   const { email, password, rememberMe } = body;
-  const user = await User.find({ email });
+  const user = await User.find({ email, is_deleted: false });
   if (user.length === 0) {
     return { error: "User not found" };
   }
@@ -24,7 +24,7 @@ const loginLogic = async (body) => {
     return { error: "Invalid password" };
   }
   try {
-    const token = jwtSign(email, rememberMe);
+    const token = jwtSign({ email }, rememberMe);
     return { token };
   } catch (err) {
     return { error: err.message };
@@ -59,7 +59,7 @@ const registerLogic = async (body) => {
 const userDetailsLogic = async (user) => {
   let users;
   try {
-    users = await User.find({ email: user.email });
+    users = await User.find({ email: user.email, is_deleted: false });
     return { user: users[0] };
   } catch (error) {
     return { error: error.message };
@@ -117,7 +117,7 @@ const verifyOtpLogic = async (body) => {
     const otpTime = Date.parse(user[0].expiry);
     const diff = currentTime - otpTime;
     if (diff > 86400) {
-      await otpModel.deleteOne({ email });
+      await otpModel.deleteMany({ email });
       return { error: "OTP expired" };
     }
   } catch (err) {
@@ -127,7 +127,7 @@ const verifyOtpLogic = async (body) => {
     return { error: "Invalid OTP" };
   }
   try {
-    await otpModel.deleteOne({ email });
+    await otpModel.deleteMany({ email });
   } catch (err) {
     return { error: err.message };
   }
