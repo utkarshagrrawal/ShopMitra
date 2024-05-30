@@ -66,19 +66,13 @@ export function ForgotPassword() {
       setLoading(false);
       ErrorAlert(data.error);
     } else {
-      const otpDigits = data.otp.split("");
       try {
         await emailjs.send(
           data.email_service_id,
           data.email_template_id,
           {
             to_email: email,
-            first: otpDigits[0],
-            second: otpDigits[1],
-            third: otpDigits[2],
-            fourth: otpDigits[3],
-            fifth: otpDigits[4],
-            sixth: otpDigits[5],
+            otp: data.otp,
           },
           {
             publicKey: data.email_public_key,
@@ -181,7 +175,6 @@ export function ForgotPassword() {
                     onChange={(e) => handleChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index, digit)}
                     onPaste={handlePaste}
-                    placeholder="0"
                     required
                     type="text"
                   />
