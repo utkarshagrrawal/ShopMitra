@@ -1,17 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function SearchBar() {
+export default function SearchBar(props) {
   const [isSearchResultVisible, setIsSearchResultVisible] = useState(false);
-  const [searchInputValue, setSearchInputValue] = useState("");
+  const [searchInputValue, setSearchInputValue] = useState(
+    props.searchQuery || ""
+  );
+  const [searchResults, setSearchResults] = useState([]);
 
   const handleSearchInputChange = (e) => {
     if (e.target.value === "") {
       setIsSearchResultVisible(false);
-    } else {
+    } else if (e.target.value.length > 2) {
       setIsSearchResultVisible(true);
     }
     setSearchInputValue(e.target.value);
   };
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL +
+            `products/search?q=${searchInputValue}&page=1`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          ErrorAlert(data.error);
+          return;
+        }
+        setSearchResults(data.products);
+      } catch (error) {
+        ErrorAlert("An error occurred while fetching search results");
+        console.log(error);
+      }
+    };
+    if (searchInputValue && searchInputValue.length > 2) {
+      fetchResults();
+    }
+  }, [searchInputValue]);
 
   const handleSearchResultsVisibility = () => {
     setIsSearchResultVisible(false);
@@ -23,7 +56,7 @@ export default function SearchBar() {
         <div>
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Enter three or more characters to search"
             onChange={handleSearchInputChange}
             onBlur={handleSearchResultsVisibility}
             onFocus={handleSearchInputChange}
@@ -35,9 +68,15 @@ export default function SearchBar() {
           />
         </div>
         <div
-          className={`flex items-center justify-center bg-[#febd68] border border-t-black border-b-black border-r-black absolute right-0 h-full w-[45px] duration-300 text-md font-semibold ${
+          className={`flex items-center justify-center bg-[#febd68] border border-t-black border-b-black border-r-black absolute right-0 h-full w-[45px] duration-300 text-md font-semibold hover:cursor-pointer ${
             isSearchResultVisible || "rounded-r-lg"
           }`}
+          onClick={() => {
+            if (searchInputValue && searchInputValue.length > 2) {
+              setIsSearchResultVisible(true);
+              location.href = "/search?q=" + searchInputValue;
+            }
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -56,15 +95,23 @@ export default function SearchBar() {
         </div>
       </div>
       {isSearchResultVisible && (
-        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full h-48 px-2 transition ease-in-out z-10">
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
-          <div className="">sdfsfs</div>
+        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full px-2 transition ease-in-out z-50">
+          {searchResults.map((result) => (
+            <div
+              key={result._id}
+              onClick={() => (location.href = "/product/" + result._id)}
+              className="flex items-center gap-2 hover:cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+            >
+              <img
+                src={result.imgUrl}
+                alt={result.name}
+                className="w-8 h-8 object-contain rounded-md"
+              />
+              <span className="text-sm text-gray-800">
+                {result.title?.substring(0, 52)}...
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>

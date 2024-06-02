@@ -11,23 +11,24 @@ export function TrendingProducts() {
       infiniteLoop={true}
       showThumbs={false}
       showStatus={false}
+      showArrows={false}
     >
       <div>
         <img
-          src="https://dlcdnwebimgs.asus.com/gain/385EAFDA-2556-4274-BC01-F05CF4EB585E/fwebp"
-          className="w-auto h-[34rem]"
+          src="https://f.media-amazon.com/images/G/31/img24/Beauty/GW/WRS/Deals_on_skincare-PC._CB556127883_.jpg"
+          className="w-auto h-auto"
         />
       </div>
       <div>
         <img
-          src="https://images-eu.ssl-images-amazon.com/images/G/31/img21/OHL_HMT/HSS21_sep/Header/image110.png"
-          className="w-auto h-[34rem]"
+          src="https://f.media-amazon.com/images/G/31/img23/Wireless/nbshagun/5g/GW/new/MAY/D119951047_WLD_5Grevamp_March2024_Tall_hero_3000x1200_3._CB557823283_.jpg"
+          className="w-auto h-auto"
         />
       </div>
       <div>
         <img
-          src="https://sslimages.shoppersstop.com/sys-master/root/h4b/h0b/32627981975582/Static-Web-Stop-Life_06052024hu.jpg"
-          className="w-auto h-[34rem]"
+          src="https://f.media-amazon.com/images/G/31/AmazonBusiness/BVD_B2C/Banner_5_3000_1200_2105._CB557675082_.jpg"
+          className="w-auto h-auto"
         />
       </div>
     </Carousel>
