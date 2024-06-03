@@ -249,9 +249,11 @@ export function Profile() {
       <div className="grid md:grid-cols-[200px_1fr] gap-8">
         <div className="flex flex-col items-center gap-4">
           <img
-            className="w-24 h-24 rounded-full"
-            src={`https://randomuser.me/api/portraits/men/1.jpg`}
-            alt="John Doe"
+            className="w-24 h-24 rounded-full border border-gray-200 shadow-md"
+            src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+              userProfileData.date_of_birth?.split("T")[0]?.split("-")[2]
+            }`}
+            alt={userProfileData.name}
           />
           <div className="text-center">
             <h2 className="text-xl font-bold">{userProfileData.name}</h2>

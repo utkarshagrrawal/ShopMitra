@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
-import logo from "../../assets/logo.png";
+import Logo from "../../components/logo";
 
 export function Signin() {
   const [loginDetails, setLoginDetails] = useState({
@@ -42,7 +42,6 @@ export function Signin() {
     if (data.error) {
       ErrorAlert(data.error);
     } else {
-      SuccessAlert("User logged in successfully");
       localStorage.setItem("token", data.token);
       navigate("/");
     }
@@ -75,7 +74,10 @@ export function Signin() {
 
   return (
     <div className="bg-gray-100 pt-4 flex flex-col min-h-screen items-center">
-      <img src={logo} className="w-20 h-20 mix-blend-normal rounded-full" />
+      <div className="flex items-center gap-2">
+        <Logo className="h-6 w-6" />
+        <span className="text-lg font-semibold">Shopmitra</span>
+      </div>
       <main className="w-full max-w-md space-y-8 px-4">
         <div>
           <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">

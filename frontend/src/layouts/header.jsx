@@ -4,7 +4,7 @@ import { CartIcon } from "../components/cartIcon";
 import { LogoutIcon } from "../components/logoutIcon";
 import { OrdersIcon } from "../components/ordersIcon";
 import { FavouriteIcon } from "../components/favouriteIcon";
-import logo from "../assets/logo.png";
+import Logo from "../components/logo";
 
 export default function Header(props) {
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
@@ -69,11 +69,14 @@ export default function Header(props) {
   }, []);
 
   return (
-    <div className="flex w-full justify-between items-center h-[60px] px-4 border-b">
+    <div className="flex w-full justify-between items-center h-auto lg:h-[60px] px-4 py-2 border-b">
       <a href="/" className="flex items-center gap-2">
-        <img src={logo} className="w-16 h-16 mix-blend-normal rounded-full" />
+        <Logo className="h-6 w-6" />
+        <span className="text-lg font-semibold">Shopmitra</span>
       </a>
-      <SearchBar searchQuery={props.searchQuery} />
+      <div className="w-full lg:w-auto flex justify-center lg:justify-start">
+        <SearchBar searchQuery={props.searchQuery} />
+      </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center relative">
           <CartIcon />
@@ -86,12 +89,14 @@ export default function Header(props) {
             <>
               <div
                 onClick={toggleProfileDropdown}
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer min-w-8"
                 ref={(input) => (profileDropdownRef.current = input)}
               >
                 <img
-                  src={`https://randomuser.me/api/portraits/men/1.jpg`}
-                  className="w-8 h-8 rounded-full"
+                  src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                    userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                  }`}
+                  className="w-8 h-8 rounded-full border border-gray-200 shadow-sm"
                 />
               </div>
               <div
@@ -107,7 +112,9 @@ export default function Header(props) {
                     onClick={() => (location.href = "/dashboard/orders")}
                   >
                     <img
-                      src={`https://randomuser.me/api/portraits/men/1.jpg`}
+                      src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                        userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                      }`}
                       className="w-8 h-8 rounded-full"
                     />
                     <span className="text-gray-800 font-medium">
@@ -128,24 +135,16 @@ export default function Header(props) {
             </>
           ) : (
             <button
-              className="flex items-center gap-2 hover:cursor-pointer"
+              className="flex items-center min-w-16 gap-2 hover:cursor-pointer px-2 py-1 border rounded-full"
               onClick={() => (location.href = "/signin")}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6 text-black"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              <span>Login</span>
+              <img
+                src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                  userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                }`}
+                className="w-8 h-8 rounded-full shadow-sm"
+              />
+              <span className="text-sm">Login</span>
             </button>
           )}
         </div>

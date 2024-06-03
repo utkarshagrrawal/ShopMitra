@@ -62,7 +62,7 @@ export default function SearchBar(props) {
             onFocus={handleSearchInputChange}
             value={searchInputValue}
             name="searchInput"
-            className={`w-[30rem] h-10 text-black border border-black px-2 pr-[48px] focus:outline-none duration-300 ${
+            className={`w-96 h-10 text-black border border-black px-2 pr-[48px] focus:outline-none duration-300 ${
               isSearchResultVisible || "rounded-lg"
             }`}
           />
@@ -95,7 +95,7 @@ export default function SearchBar(props) {
         </div>
       </div>
       {isSearchResultVisible && (
-        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full px-2 transition ease-in-out z-50">
+        <div className="absolute top-10 bg-white border-b border-l border-r border-black w-full transition ease-in-out z-50">
           {searchResults.map((result) => (
             <div
               key={result._id}
