@@ -6,7 +6,7 @@ const {
 } = require("../controllers/productController");
 const router = express.Router();
 
-router.get("/search", authenticate, fetchProductsController);
+router.get("/search", fetchProductsController);
 router.post("/add-to-wishlist", authenticate, addProductToWishlistController);
 
 module.exports = router;
