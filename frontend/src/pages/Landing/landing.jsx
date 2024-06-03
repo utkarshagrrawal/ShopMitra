@@ -4,6 +4,9 @@ import { CircleCheckIcon } from "../../components/circleCheckIcon";
 import { ProductCard } from "./productCard";
 import { ReviewCard } from "./reviewCard";
 import { Link } from "react-router-dom";
+import { PhoneIcon } from "../../components/phoneIcon";
+import { InboxIcon } from "../../components/inboxIcon";
+import { LocateIcon } from "../../components/locateIcon";
 
 export default function Landing() {
   return (
@@ -207,17 +210,17 @@ export default function Landing() {
             <h3 className="text-lg font-bold">Contact Us</h3>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                {/* <PhoneIcon className="h-5 w-5 text-gray-400" /> */}
+                <PhoneIcon />
                 <span className="text-gray-400">+91 63505 55537</span>
               </div>
               <div className="flex items-center space-x-2">
-                {/* <InboxIcon className="h-5 w-5 text-gray-400" /> */}
+                <InboxIcon className="h-5 w-5 text-gray-400" />
                 <span className="text-gray-400">
                   utkarshagrawal09jan@gmail.com
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                {/* <LocateIcon className="h-5 w-5 text-gray-400" /> */}
+                <LocateIcon className="h-5 w-5 text-gray-400" />
                 <span className="text-gray-400">India</span>
               </div>
             </div>
