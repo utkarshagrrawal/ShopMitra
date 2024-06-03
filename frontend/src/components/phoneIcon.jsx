@@ -6,7 +6,7 @@ export function PhoneIcon() {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      class="size-4"
+      className="size-4"
     >
       <path
         fillRule="evenodd"
