@@ -135,16 +135,15 @@ export default function Header(props) {
             </>
           ) : (
             <button
-              className="flex items-center min-w-16 gap-2 hover:cursor-pointer px-2 py-1 border rounded-full"
+              className="flex items-center hover:cursor-pointer px-2 py-1"
               onClick={() => (location.href = "/signin")}
             >
               <img
                 src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
                   userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
                 }`}
-                className="w-8 h-8 rounded-full shadow-sm"
+                className="min-w-8 h-8 border rounded-full shadow-sm"
               />
-              <span className="text-sm">Login</span>
             </button>
           )}
         </div>

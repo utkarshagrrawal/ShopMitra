@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ErrorAlert } from "../global/alerts";
 
 export default function SearchBar(props) {
   const [isSearchResultVisible, setIsSearchResultVisible] = useState(false);
