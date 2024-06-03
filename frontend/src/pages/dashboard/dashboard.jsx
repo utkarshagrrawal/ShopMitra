@@ -4,21 +4,32 @@ import { ChevronRightIcon } from "../../components/chevronRightIcon";
 import { ChevronDownIcon } from "../../components/chevronDownIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import ToggleSwitch from "../../components/toggleButton";
-import DeleteConfirmationModal from "../../components/modal";
+import DeleteConfirmationModal from "../../components/deleteModal";
 
 export function Profile() {
   const { section } = useParams();
   const [currentSection, setCurrentSection] = useState(section || "orders");
   const [userProfileData, setUserProfileData] = useState({
     name: "",
-    email: "",
     phone: "",
     address: "",
-    dob: "",
+    date_of_birth: "",
   });
   const [editMode, setEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [notificationPreferences, setNotificationPreferences] = useState({});
+  const [notificationPreferencesUpdating, setNotificationPreferencesUpdating] =
+    useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [wishlist, setWishlist] = useState([]);
+  const [wishlistLoading, setWishlistLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -35,13 +46,47 @@ export function Profile() {
       if (data.error) {
         if (data.error === "Unauthorized") {
           localStorage.removeItem("token");
+          ErrorAlert("You are not logged in. Please login to view this page.");
         }
-        ErrorAlert("You are not logged in. Please login to view this page.");
+        ErrorAlert(data.error);
       } else {
-        setUserProfileData(data.user);
+        setUserProfileData({
+          name: data.user.name,
+          email: data.user.email,
+          phone: data.user.phone,
+          address: data.user.address,
+          date_of_birth: data.user.date_of_birth,
+        });
+        setNotificationPreferences({
+          orderUpdates: data.user.notification_preferences?.orderUpdates,
+          promotions: data.user.notification_preferences?.promotions,
+          newsletter: data.user.notification_preferences?.newsletter,
+        });
       }
     };
     fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "user/wishlist",
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        ErrorAlert(data.error);
+      } else {
+        setWishlistLoading(false);
+        setWishlist(data.wishlist);
+      }
+    };
+    fetchWishlist();
   }, []);
 
   const handleNewProfileDetails = (e) => {
@@ -56,23 +101,30 @@ export function Profile() {
     if (
       !userProfileData.name ||
       !userProfileData.phone ||
-      !userProfileData.dob
+      !userProfileData.date_of_birth
     ) {
       ErrorAlert("Please fill all the fields");
       return;
     }
+
     setEditMode(false);
+    setIsSaving(true);
+
     const response = await fetch(
       import.meta.env.VITE_BACKEND_URL + "user/update-profile",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
         },
         body: JSON.stringify(userProfileData),
       }
     );
     const data = await response.json();
+
+    setIsSaving(false);
+
     if (data.error) {
       ErrorAlert(data.error);
     } else {
@@ -80,10 +132,36 @@ export function Profile() {
     }
   };
 
-  const handleSavePassword = async () => {};
+  const handleEditNotificationPreferences = (e) => {
+    setNotificationPreferences({
+      ...notificationPreferences,
+      [e.target.id]: e.target.checked,
+    });
+  };
 
-  const handleDeleteAccount = async () => {
-    setDeleteModalOpen(true);
+  const handleSaveNotificationPreferences = async () => {
+    setNotificationPreferencesUpdating(true);
+
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "user/notification-preferences",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify(notificationPreferences),
+      }
+    );
+    const data = await response.json();
+
+    setNotificationPreferencesUpdating(false);
+
+    if (data.error) {
+      ErrorAlert(data.error);
+    } else {
+      SuccessAlert(data.message);
+    }
   };
 
   const getStrengthColor = (strength) => {
@@ -105,23 +183,77 @@ export function Profile() {
 
   const handlePasswordStrength = (e) => {
     const password = e.target.value;
-    let score = 1;
+    let score = 0;
     if (password.length > 12) score++;
     if (password.match(/[a-z]/)) score++;
     if (password.match(/[A-Z]/)) score++;
     if (password.match(/\d+/)) score++;
     if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score++;
+    if (password.length === 0) score = 0;
     setPasswordStrength(score);
   };
 
+  const handlePasswordDetails = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+    if (e.target.name === "newPassword") handlePasswordStrength(e);
+  };
+
+  const handleSavePassword = async () => {
+    if (
+      !passwordData.currentPassword ||
+      !passwordData.newPassword ||
+      !passwordData.confirmPassword
+    ) {
+      ErrorAlert("Please fill all the fields");
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      ErrorAlert("Passwords do not match");
+      return;
+    }
+    if (passwordStrength < 3) {
+      ErrorAlert("Password is too weak");
+      return;
+    }
+
+    setChangingPassword(true);
+
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "user/change-password",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify(passwordData),
+      }
+    );
+    const data = await response.json();
+
+    setChangingPassword(false);
+
+    if (data.error) {
+      ErrorAlert(data.error);
+    } else {
+      SuccessAlert(data.message);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteModalOpen(true);
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4 md:px-6">
+    <div className="container mx-auto py-8 px-4 md:px-4">
       <div className="grid md:grid-cols-[200px_1fr] gap-8">
         <div className="flex flex-col items-center gap-4">
           <img
-            className="w-24 h-24 rounded-full"
-            src={`https://randomuser.me/api/portraits/men/1.jpg`}
-            alt="John Doe"
+            className="w-24 h-24 rounded-full border border-gray-200 shadow-md"
+            src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+              userProfileData.date_of_birth?.split("T")[0]?.split("-")[2]
+            }`}
+            alt={userProfileData.name}
           />
           <div className="text-center">
             <h2 className="text-xl font-bold">{userProfileData.name}</h2>
@@ -210,6 +342,7 @@ export function Profile() {
             </div>
           </div>
         </div>
+
         {currentSection === "orders" && (
           <div className="grid gap-8">
             <div>
@@ -267,64 +400,59 @@ export function Profile() {
             </div>
             <div>
               <h3 className="text-lg font-semibold">Wishlist</h3>
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl transition-transform duration-300 ease-in-out hover:-translate-y-2">
-                  <img
-                    alt="Product 1"
-                    className="object-contain w-full h-48"
-                    src="https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png"
-                  />
-                  <div className="bg-white p-4">
-                    <h4 className="font-semibold">Makeup kit</h4>
-                    <p className="text-sm text-gray-500">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Quae aspernatur hic sed aliquam sit ratione tempore
-                      inventore rerum libero doloribus fugiat quibusdam, dolor
-                      dolore ullam blanditiis deserunt id quod possimus.
-                    </p>
-                    <div className="mt-2 text-sm font-medium">₹49.99</div>
-                  </div>
-                </div>
-                <div className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl transition-transform duration-300 ease-in-out hover:-translate-y-2">
-                  <img
-                    alt="Product 2"
-                    className="object-contain w-full h-48"
-                    src="https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"
-                  />
-                  <div className="bg-white p-4">
-                    <h4 className="font-semibold">Eye lash</h4>
-                    <p className="text-sm text-gray-500">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Magni, corrupti. Expedita, ratione dolor quos obcaecati
-                      autem eligendi maiores fugit consequatur tempore iure illo
-                      cupiditate animi id, quisquam veritatis doloribus vitae!
-                    </p>
-                    <div className="mt-2 text-sm font-medium">₹79.99</div>
-                  </div>
-                </div>
-                <div className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl transition-transform duration-300 ease-in-out hover:-translate-y-2">
-                  <img
-                    alt="Product 3"
-                    className="object-contain w-full h-48"
-                    src="https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/thumbnail.png"
-                  />
-                  <div className="bg-white p-4">
-                    <h4 className="font-semibold">Foundation</h4>
-                    <p className="text-sm text-gray-500">
-                      Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                      Corporis blanditiis impedit reiciendis repellat ipsam
-                      cupiditate est obcaecati minima quibusdam recusandae
-                      numquam tenetur, ullam cum ducimus repellendus doloremque,
-                      soluta ea! Impedit.
-                    </p>
-                    <div className="mt-2 text-sm font-medium">₹99.99</div>
-                  </div>
-                </div>
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wishlistLoading
+                  ? [...Array(3)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
+                      >
+                        <div className="animate-pulse">
+                          <div className="bg-gray-300 object-contain w-full h-48"></div>
+                          <div className="bg-white p-4">
+                            <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
+                            <div className="space-y-2">
+                              <div className="h-4 bg-gray-300 rounded-md"></div>
+                              <div className="h-4 bg-gray-300 rounded-md"></div>
+                              <div className="h-4 bg-gray-300 rounded-md"></div>
+                            </div>
+                            <div className="mt-2 h-6 bg-gray-300 rounded-md"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  : wishlist.map((product, i) => (
+                      <div
+                        key={i}
+                        className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
+                      >
+                        <img
+                          alt="Product 1"
+                          className="object-contain w-full h-32"
+                          src={product.imgUrl}
+                        />
+                        <div className="bg-white p-4">
+                          <p className="text-sm text-gray-500">
+                            {product.title}
+                          </p>
+                          <div className="mt-2 text-sm font-medium">
+                            <span>$</span> {product.price}
+                            {product.listPrice > product.price && (
+                              <span className="text-gray-500 line-through ml-2">
+                                {product.listPrice}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
               </div>
-              <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4">
-                <div className="text-sm font-medium">View more</div>
-                <ChevronDownIcon />
-              </div>
+              {!wishlistLoading && wishlist.length > 3 && (
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4">
+                  <div className="text-sm font-medium">View more</div>
+                  <ChevronDownIcon />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -337,7 +465,6 @@ export function Profile() {
                 className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
                 type="text"
                 name="name"
-                placeholder={userProfileData.name}
                 value={userProfileData.name || ""}
                 onChange={handleNewProfileDetails}
                 disabled={!editMode}
@@ -354,7 +481,6 @@ export function Profile() {
                 className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all cursor-not-allowed"
                 type="email"
                 name="email"
-                placeholder={userProfileData.email}
                 value={userProfileData.email || ""}
                 disabled
               />
@@ -365,7 +491,6 @@ export function Profile() {
                 className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
                 type="tel"
                 name="phone"
-                placeholder={userProfileData.phone}
                 value={userProfileData.phone || ""}
                 onChange={handleNewProfileDetails}
                 disabled={!editMode}
@@ -377,7 +502,6 @@ export function Profile() {
                 className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
                 type="text"
                 name="address"
-                placeholder={userProfileData.address}
                 value={userProfileData.address || ""}
                 onChange={handleNewProfileDetails}
                 disabled={!editMode}
@@ -388,8 +512,7 @@ export function Profile() {
               <input
                 className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
                 type="date"
-                name="dob"
-                placeholder={userProfileData.dob}
+                name="date_of_birth"
                 value={userProfileData.date_of_birth?.split("T")[0] || ""}
                 onChange={handleNewProfileDetails}
                 disabled={!editMode}
@@ -397,14 +520,39 @@ export function Profile() {
             </div>
             <div className="mt-4 flex justify-end">
               <button
-                className={`text-white px-4 py-2 rounded-lg transition-colors duration-200 ease-in-out ${
+                className={`text-white px-4 py-2 rounded-lg flex justify-center ${
                   editMode
                     ? "bg-green-500 hover:bg-green-600"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
                 onClick={handleEditProfile}
               >
-                {editMode ? "Save" : "Edit"}
+                {isSaving ? (
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : editMode ? (
+                  "Save"
+                ) : (
+                  "Edit"
+                )}
               </button>
             </div>
           </div>
@@ -459,46 +607,63 @@ export function Profile() {
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm font-medium">Order Updates</div>
                 <div>
-                  <ToggleSwitch />
+                  <ToggleSwitch
+                    id="orderUpdates"
+                    notificationPreferences={notificationPreferences}
+                    onChange={handleEditNotificationPreferences}
+                  />
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm font-medium">Promotions</div>
                 <div>
-                  <ToggleSwitch />
+                  <ToggleSwitch
+                    id="promotions"
+                    notificationPreferences={notificationPreferences}
+                    onChange={handleEditNotificationPreferences}
+                  />
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm font-medium">Newsletter</div>
                 <div>
-                  <ToggleSwitch />
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Push Notifications</h3>
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm font-medium">Order Updates</div>
-                <div>
-                  <ToggleSwitch />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm font-medium">Promotions</div>
-                <div>
-                  <ToggleSwitch />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm font-medium">Newsletter</div>
-                <div>
-                  <ToggleSwitch />
+                  <ToggleSwitch
+                    id="newsletter"
+                    notificationPreferences={notificationPreferences}
+                    onChange={handleEditNotificationPreferences}
+                  />
                 </div>
               </div>
             </div>
             <div className="mt-4 flex justify-end">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4 transition-colors duration-200 ease-in-out">
-                Save Preferences
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4 flex justify-center"
+                onClick={handleSaveNotificationPreferences}
+              >
+                {notificationPreferencesUpdating ? (
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Save Preferences"
+                )}
               </button>
             </div>
           </div>
@@ -514,16 +679,21 @@ export function Profile() {
                   type="password"
                   name="currentPassword"
                   placeholder="Current Password"
+                  onChange={handlePasswordDetails}
                 />
                 <div className="flex flex-col">
                   <input
                     className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
                     type="password"
-                    name="password"
+                    name="newPassword"
                     placeholder="New Password"
-                    onKeyDown={handlePasswordStrength}
+                    onChange={handlePasswordDetails}
                   />
-                  <div className="flex w-full h-4 my-2 transition-colors duration-200">
+                  <div
+                    className={`flex w-full h-4 my-2 transition-colors duration-200 ${
+                      passwordStrength === 0 ? "hidden" : "block"
+                    }`}
+                  >
                     {[...Array(5)].map((_, i) => {
                       return (
                         <div
@@ -534,7 +704,7 @@ export function Profile() {
                               : i === 4
                               ? "border rounded-r-lg w-full"
                               : "border w-full"
-                          } ${
+                          } transition-colors duration-300 ${
                             passwordStrength > i &&
                             getStrengthColor(passwordStrength)
                           }`}
@@ -551,7 +721,9 @@ export function Profile() {
                       ? "Medium"
                       : passwordStrength === 4
                       ? "Strong"
-                      : "Very strong"}
+                      : passwordStrength === 5
+                      ? "Very strong"
+                      : ""}
                   </span>
                 </div>
                 <input
@@ -559,12 +731,39 @@ export function Profile() {
                   type="password"
                   name="confirmPassword"
                   placeholder="Confirm New Password"
+                  onChange={handlePasswordDetails}
                 />
                 <button
-                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 transition-colors duration-200 ease-in-out"
+                  className={`bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 transition-colors duration-200 ease-in-out flex justify-center ${
+                    changingPassword && "cursor-not-allowed opacity-50"
+                  }`}
+                  disabled={changingPassword}
                   onClick={handleSavePassword}
                 >
-                  Save Password
+                  {changingPassword ? (
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : (
+                    "Save Password"
+                  )}
                 </button>
               </div>
             </div>

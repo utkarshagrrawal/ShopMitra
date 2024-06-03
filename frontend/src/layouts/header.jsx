@@ -4,7 +4,7 @@ import { CartIcon } from "../components/cartIcon";
 import { LogoutIcon } from "../components/logoutIcon";
 import { OrdersIcon } from "../components/ordersIcon";
 import { FavouriteIcon } from "../components/favouriteIcon";
-import logo from "../assets/logo.png";
+import Logo from "../components/logo";
 
 export default function Header(props) {
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
@@ -69,101 +69,82 @@ export default function Header(props) {
   }, []);
 
   return (
-    <div className="flex w-full justify-between items-center h-[60px] px-4 border-b">
-      <img src={logo} className="w-16 h-16 mix-blend-normal rounded-full" />
-      <SearchBar />
+    <div className="flex w-full justify-between items-center h-auto lg:h-[60px] px-4 py-2 border-b">
+      <a href="/" className="flex items-center gap-2">
+        <Logo className="h-6 w-6" />
+        <span className="text-lg font-semibold">Shopmitra</span>
+      </a>
+      <div className="w-full lg:w-auto flex justify-center lg:justify-start">
+        <SearchBar searchQuery={props.searchQuery} />
+      </div>
       <div className="flex items-center gap-4">
-        <div className="flex items-center">
+        <div className="flex items-center relative">
           <CartIcon />
-          <span className="text-black ml-2">{props?.quantity || 0}</span>
+          <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            {props?.quantity ? (props.quantity > 9 ? "9+" : props.quantity) : 0}
+          </span>
         </div>
         <div className="flex flex-col items-center relative">
           {isUserSignedIn ? (
             <>
               <div
                 onClick={toggleProfileDropdown}
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer min-w-8"
                 ref={(input) => (profileDropdownRef.current = input)}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 text-black"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  />
-                </svg>
+                <img
+                  src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                    userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                  }`}
+                  className="w-8 h-8 rounded-full border border-gray-200 shadow-sm"
+                />
               </div>
               <div
-                className={`absolute mr-44 top-[60px] bg-white border border-black rounded-lg w-48 h-auto duration-300 z-10 ${
-                  isProfileDropdownOpen ? "block" : "hidden"
+                className={`absolute z-30 right-0 top-[60px] bg-white border border-gray-200 rounded-lg w-48 h-auto shadow-lg transform transition-transform duration-300 ease-in-out ${
+                  isProfileDropdownOpen
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-95 pointer-events-none"
                 }`}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col bg-white rounded-lg overflow-hidden">
                   <button
-                    className="w-full flex items-center h-12 border-b px-4 gap-4"
+                    className="w-full flex items-center h-12 border-b px-4 gap-4 hover:bg-gray-100"
                     onClick={() => (location.href = "/dashboard/orders")}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-[18px] h-[18px] text-black"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                      />
-                    </svg>
-                    My account
-                  </button>
-                  <button className="w-full flex items-center h-12 border-b px-4 gap-4">
-                    <FavouriteIcon />
-                    Favourites
-                  </button>
-                  <button className="w-full flex items-center h-12 border-b px-4 gap-4">
-                    <OrdersIcon />
-                    Orders
+                    <img
+                      src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                        userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                      }`}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="text-gray-800 font-medium">
+                      My Account
+                    </span>
                   </button>
                   <button
-                    className="w-full flex items-center h-12 px-4 gap-4"
+                    className="w-full flex items-center h-12 px-4 gap-4 hover:bg-gray-100"
                     onClick={handleLogout}
                   >
-                    <LogoutIcon />
-                    Logout
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <LogoutIcon />
+                    </div>
+                    <span className="text-gray-800 font-medium">Logout</span>
                   </button>
                 </div>
               </div>
             </>
           ) : (
             <button
-              className="flex items-center gap-2 hover:cursor-pointer"
+              className="flex items-center min-w-16 gap-2 hover:cursor-pointer px-2 py-1 border rounded-full"
               onClick={() => (location.href = "/signin")}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6 text-black"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              <span>Login</span>
+              <img
+                src={`https://api.dicebear.com/8.x/notionists/svg?seed=${
+                  userDetails.date_of_birth?.split("T")[0]?.split("-")[2]
+                }`}
+                className="w-8 h-8 rounded-full shadow-sm"
+              />
+              <span className="text-sm">Login</span>
             </button>
           )}
         </div>

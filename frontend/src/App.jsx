@@ -6,8 +6,9 @@ import { Signup } from "./pages/signup/singup";
 import { Toaster } from "react-hot-toast";
 import { ForgotPassword } from "./pages/forgotpwd/forgotPassword";
 import { ResetPassword } from "./pages/forgotpwd/resetPassword";
-import { Profile } from "./pages/dashboard/profile";
+import { Profile } from "./pages/dashboard/dashboard";
 import { NotFound } from "./global/404";
+import { SearchResults } from "./pages/search/results";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route path="/resetpassword" element={<ResetPassword />}></Route>
         <Route path="/dashboard/:section" element={<Profile />}></Route>
+        <Route path="/search" element={<SearchResults />}></Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </Router>

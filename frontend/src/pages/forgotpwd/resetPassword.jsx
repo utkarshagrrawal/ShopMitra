@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
-import logo from "../../assets/logo.png";
+import Logo from "../../components/logo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export function ResetPassword() {
@@ -53,7 +53,10 @@ export function ResetPassword() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-start bg-gray-100 px-4 py-12">
-      <img src={logo} className="w-20 h-20 mix-blend-normal rounded-full" />
+      <div className="flex items-center gap-2">
+        <Logo className="h-6 w-6" />
+        <span className="text-lg font-semibold">Shopmitra</span>
+      </div>
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">
