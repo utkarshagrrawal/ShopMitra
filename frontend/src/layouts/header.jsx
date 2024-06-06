@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import SearchBar from "./searchBar";
 import { CartIcon } from "../components/cartIcon";
 import { LogoutIcon } from "../components/logoutIcon";
-import { OrdersIcon } from "../components/ordersIcon";
-import { FavouriteIcon } from "../components/favouriteIcon";
 import Logo from "../components/logo";
 
 export default function Header(props) {
@@ -42,27 +40,26 @@ export default function Header(props) {
   useEffect(() => {
     const isUserLoggedIn = async () => {
       const token = localStorage.getItem("token");
-      if (token) {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token,
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          if (data.error === "Unauthorized") {
-            localStorage.removeItem("token");
-          }
-          setIsUserSignedIn(false);
-        } else {
-          setIsUserSignedIn(true);
-          setUserDetails(data.user);
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
         }
+      );
+      const data = await response.json();
+      if (data.error) {
+        if (data.error === "Unauthorized") {
+          localStorage.removeItem("token");
+          props?.redirectTo && (location.href = props.redirectTo);
+        }
+        setIsUserSignedIn(false);
+      } else {
+        setIsUserSignedIn(true);
+        setUserDetails(data.user);
       }
     };
     isUserLoggedIn();
@@ -78,7 +75,10 @@ export default function Header(props) {
         <SearchBar searchQuery={props.searchQuery} />
       </div>
       <div className="flex items-center gap-4">
-        <div className="flex items-center relative">
+        <div
+          className="flex items-center relative hover:cursor-pointer"
+          onClick={() => (location.pathname = "/cart")}
+        >
           <CartIcon />
           <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
             {props?.quantity ? (props.quantity > 9 ? "9+" : props.quantity) : 0}

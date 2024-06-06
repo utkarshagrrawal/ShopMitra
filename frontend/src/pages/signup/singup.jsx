@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getExactYearsDifference } from "../../global/helpers";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import { Link } from "react-router-dom";
@@ -14,6 +14,31 @@ export function Signup() {
     dob: "",
   });
   const [registering, setRegistering] = useState(false);
+
+  useEffect(() => {
+    const isUserLoggedIn = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          localStorage.removeItem("token");
+        } else {
+          navigate("/");
+        }
+      }
+    };
+    isUserLoggedIn();
+  }, []);
 
   const handleSignupDetailsChange = (e) => {
     setSignupDetails({ ...signupDetails, [e.target.name]: e.target.value });
@@ -74,7 +99,10 @@ export function Signup() {
 
   return (
     <div className="bg-gray-100 min-h-screen pt-4 flex flex-col items-center px-4">
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        onClick={() => (location.href = "/")}
+      >
         <Logo className="h-6 w-6" />
         <span className="text-lg font-semibold">Shopmitra</span>
       </div>

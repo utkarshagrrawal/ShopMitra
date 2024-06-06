@@ -4,7 +4,7 @@ import { ChevronRightIcon } from "../../components/chevronRightIcon";
 import { ChevronDownIcon } from "../../components/chevronDownIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import ToggleSwitch from "../../components/toggleButton";
-import DeleteConfirmationModal from "../../components/deleteModal";
+import DeleteConfirmationModal from "../../layouts/deleteModal";
 
 export function Profile() {
   const { section } = useParams();

@@ -11,6 +11,7 @@ export function Signin() {
   });
   const [signingIn, setSigningIn] = useState(false);
   const navigate = useNavigate();
+  const params = new URLSearchParams(location.search);
 
   const handleLoginDetailsChange = (e) => {
     const { name, value, type } = e.target;
@@ -43,7 +44,11 @@ export function Signin() {
       ErrorAlert(data.error);
     } else {
       localStorage.setItem("token", data.token);
-      navigate("/");
+      if (decodeURIComponent(params.get("redirectTo"))) {
+        navigate(decodeURIComponent(params.get("redirectTo")));
+      } else {
+        navigate("/");
+      }
     }
   };
 
@@ -74,7 +79,10 @@ export function Signin() {
 
   return (
     <div className="bg-gray-100 pt-4 flex flex-col min-h-screen items-center">
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        onClick={() => (location.href = "/")}
+      >
         <Logo className="h-6 w-6" />
         <span className="text-lg font-semibold">Shopmitra</span>
       </div>
