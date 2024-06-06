@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../../layouts/header";
 import { useSearchParams } from "react-router-dom";
 import { ErrorAlert } from "../../global/alerts";
-import { Product } from "../product/product";
+import { Product } from "./product";
 import { ChevronDownIcon } from "../../components/chevronDownIcon";
 import Loader from "../../components/loader";
 

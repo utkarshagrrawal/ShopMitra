@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ErrorAlert } from "../../global/alerts";
 import emailjs from "@emailjs/browser";
 import Logo from "../../components/logo";
@@ -11,6 +11,31 @@ export function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false);
   const otpElementRef = useRef([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isUserLoggedIn = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          localStorage.removeItem("token");
+        } else {
+          navigate("/");
+        }
+      }
+    };
+    isUserLoggedIn();
+  }, []);
 
   const handleChange = (e, index) => {
     if (/^[0-9]{1}$/.test(e.target.value) && index <= 5) {
@@ -122,7 +147,10 @@ export function ForgotPassword() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-start bg-gray-100 px-4 py-12">
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        onClick={() => (location.href = "/")}
+      >
         <Logo className="h-6 w-6" />
         <span className="text-lg font-semibold">Shopmitra</span>
       </div>

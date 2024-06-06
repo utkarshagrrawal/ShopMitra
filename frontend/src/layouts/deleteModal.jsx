@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import InfoIcon from "./infoIcon";
-import Loader from "./loader";
+import InfoIcon from "../components/infoIcon";
+import Loader from "../components/loader";
 import { ErrorAlert } from "../global/alerts";
 
 export default function DeleteConfirmationModal(props) {

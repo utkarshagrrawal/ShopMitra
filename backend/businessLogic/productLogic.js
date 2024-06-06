@@ -1,5 +1,6 @@
 const { Product } = require("../models/productModel");
 const { Wishlist } = require("../models/wishlistModel");
+const { Cart } = require("../models/cartModel");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
@@ -56,7 +57,76 @@ const addProductToWishlistLogic = async (query, user) => {
   }
 };
 
+const fetchProductDetailsLogic = async (params) => {
+  const { id } = params;
+  try {
+    const product = await Product.findOne({ _id: id });
+    return { product };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const addRemoveProductToCartLogic = async (query, user) => {
+  const { productId, operationType } = query;
+  const { email } = user;
+
+  try {
+    if (operationType === "add") {
+      const isCartExists = await Cart.findOne({ email: email });
+      if (!isCartExists) {
+        await Cart.create({
+          email: email,
+          products: [{ product: productId, quantity: 1 }],
+        });
+        return { message: "Product added to cart", quantity: 1 };
+      }
+      const isProductInCart = await Cart.findOne({
+        email: email,
+        products: { $elemMatch: { product: productId } },
+      });
+      if (isProductInCart) {
+        await Cart.updateOne(
+          { email: email, products: { $elemMatch: { product: productId } } },
+          { $inc: { "products.$.quantity": 1 } }
+        );
+        return {
+          message: "Product added to cart",
+          quantity: isProductInCart.products[0].quantity + 1,
+        };
+      } else {
+        await Cart.updateOne(
+          { email: email },
+          { $push: { products: { product: productId, quantity: 1 } } }
+        );
+        return { message: "Product added to cart", quantity: 1 };
+      }
+    } else {
+      const isProductInCart = await Cart.findOne({
+        email: email,
+        products: { $elemMatch: { product: productId } },
+      });
+      if (isProductInCart && isProductInCart.products[0].quantity >= 1) {
+        await Cart.updateOne(
+          { email: email, products: { $elemMatch: { product: productId } } },
+          { $inc: { "products.$.quantity": -1 } }
+        );
+        return {
+          message: "Product removed from cart",
+          quantity: isProductInCart.products[0].quantity - 1,
+        };
+      } else {
+        return { message: "Product not in cart", quantity: 0 };
+      }
+    }
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
+  fetchProductDetailsLogic,
+  addRemoveProductToCartLogic,
 };

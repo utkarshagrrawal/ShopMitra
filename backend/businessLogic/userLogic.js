@@ -1,3 +1,4 @@
+const { Cart } = require("../models/cartModel");
 const { Product } = require("../models/productModel");
 const { User } = require("../models/userModel");
 const { Wishlist } = require("../models/wishlistModel");
@@ -103,10 +104,32 @@ const fetchUserWislistLogic = async (user) => {
   }
 };
 
+const fetchUserCartLogic = async (user) => {
+  const { email } = user;
+  try {
+    const cart = await Cart.findOne({ email: email });
+    let products = [];
+    if (cart) {
+      await Promise.all(
+        cart.products.map(async (product) => {
+          const productDetails = await Product.findOne({
+            _id: product.product,
+          });
+          products.push({ ...productDetails._doc, quantity: product.quantity });
+        })
+      );
+    }
+    return { cart: products };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   updateProfileLogic,
   changeUserPasswordLogic,
   notificationPreferencesUpdateLogic,
   deleteUserLogic,
   fetchUserWislistLogic,
+  fetchUserCartLogic,
 };

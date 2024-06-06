@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import Logo from "../../components/logo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +7,12 @@ export function ResetPassword() {
   const { state } = useLocation();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!state?.email) {
+      navigate("/forgotpassword");
+    }
+  }, []);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -53,7 +59,10 @@ export function ResetPassword() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-start bg-gray-100 px-4 py-12">
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2"
+        onClick={() => (location.href = "/")}
+      >
         <Logo className="h-6 w-6" />
         <span className="text-lg font-semibold">Shopmitra</span>
       </div>

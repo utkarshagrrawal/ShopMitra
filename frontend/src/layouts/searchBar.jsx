@@ -75,7 +75,7 @@ export default function SearchBar(props) {
           onClick={() => {
             if (searchInputValue && searchInputValue.length > 2) {
               setIsSearchResultVisible(true);
-              location.href = "/search?q=" + searchInputValue;
+              location.href = "/results?q=" + searchInputValue;
             }
           }}
         >
