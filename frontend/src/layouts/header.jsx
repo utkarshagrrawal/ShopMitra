@@ -119,10 +119,10 @@ export default function Header(props) {
           >
             <CartIcon />
             <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-              {props?.quantity
-                ? props.quantity > 9
+              {cartItemsQuantity
+                ? cartItemsQuantity > 9
                   ? "9+"
-                  : props.quantity
+                  : cartItemsQuantity
                 : 0}
             </span>
           </div>
