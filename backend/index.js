@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const mongodbConnect = require("./services/dbService");
+const {
+  main: mongodbConnect,
+  checkMongoDBConnection,
+} = require("./services/dbService");
 
 mongodbConnect();
 
@@ -8,6 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  if (checkMongoDBConnection() !== 1) {
+    mongodbConnect();
+  }
+  next();
+});
 app.use("/auth", require("./routes/authRoute"));
 app.use("/user", require("./routes/userRoute"));
 app.use("/products", require("./routes/productRoute"));

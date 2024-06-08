@@ -5,6 +5,7 @@ const {
   addProductToWishlistController,
   fetchProductDetailsController,
   addRemoveProductToCartController,
+  removeItemFromCartController,
 } = require("../controllers/productController");
 const router = express.Router();
 
@@ -14,6 +15,11 @@ router.post(
   "/add-remove-product-in-cart",
   authenticate,
   addRemoveProductToCartController
+);
+router.delete(
+  "/remove-item-from-cart",
+  authenticate,
+  removeItemFromCartController
 );
 router.get("/:id", fetchProductDetailsController);
 

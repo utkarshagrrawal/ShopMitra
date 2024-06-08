@@ -24,19 +24,19 @@ export function CartItemCard(props) {
         ErrorAlert(data.error);
         return;
       }
+      props?.setCartItems((prev) =>
+        prev.map((item) => {
+          if (item._id === props?.productId) {
+            return { ...item, quantity: item.quantity - 1 };
+          }
+          return item;
+        })
+      );
+      props?.setLoading(true);
     } catch (error) {
       ErrorAlert("Something went wrong. Please try again later.");
       return;
     }
-    props?.setCartItems((prev) =>
-      prev.map((item) => {
-        if (item._id === props?.productId) {
-          return { ...item, quantity: item.quantity - 1 };
-        }
-        return item;
-      })
-    );
-    props?.setLoading(true);
   };
 
   const handleIncreaseItemQuantity = async () => {
@@ -59,19 +59,19 @@ export function CartItemCard(props) {
         ErrorAlert(data.error);
         return;
       }
+      props?.setCartItems((prev) =>
+        prev.map((item) => {
+          if (item._id === props?.productId) {
+            return { ...item, quantity: item.quantity + 1 };
+          }
+          return item;
+        })
+      );
+      props?.setLoading(true);
     } catch (error) {
       ErrorAlert("Something went wrong. Please try again later.");
       return;
     }
-    props?.setCartItems((prev) =>
-      prev.map((item) => {
-        if (item._id === props?.productId) {
-          return { ...item, quantity: item.quantity + 1 };
-        }
-        return item;
-      })
-    );
-    props?.setLoading(true);
   };
 
   const handleRemoveItem = async () => {
