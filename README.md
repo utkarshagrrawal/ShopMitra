@@ -61,4 +61,4 @@ If you have any questions, feel free to reach out:
 
 ---
 
-Thank you for visiting Shopmitra! We hope you enjoy using it as much as we enjoyed developing it. Happy shopping! 🛒
+Thank you for visiting Shopmitra! I hope you enjoy using it as much as I enjoyed developing it. Happy shopping! 🛒
