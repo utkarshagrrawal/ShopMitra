@@ -6,6 +6,7 @@ import Logo from "../components/logo";
 
 export default function Header(props) {
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
+  const [cartItemsQuantity, setCartItemsQuantity] = useState(0);
   const [userDetails, setUserDetails] = useState({});
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -75,6 +76,33 @@ export default function Header(props) {
       }
     };
     isUserLoggedIn();
+  }, []);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "user/cart",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          ErrorAlert(data.error);
+          return;
+        }
+        setCartItemsQuantity(data.cart.length);
+      } catch (error) {
+        ErrorAlert("An error occurred while fetching cart items");
+        console.log(error);
+      }
+    };
+    fetchCartItems();
   }, []);
 
   return windowWidth < 600 ? (
@@ -189,7 +217,11 @@ export default function Header(props) {
         >
           <CartIcon />
           <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-            {props?.quantity ? (props.quantity > 9 ? "9+" : props.quantity) : 0}
+            {cartItemsQuantity
+              ? cartItemsQuantity > 9
+                ? "9+"
+                : cartItemsQuantity
+              : 0}
           </span>
         </div>
         <div className="flex flex-col items-center relative">

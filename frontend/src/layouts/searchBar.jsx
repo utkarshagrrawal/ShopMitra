@@ -53,6 +53,7 @@ export default function SearchBar(props) {
     return () => abortController.abort();
   }, [searchInputValue]);
 
+  // removed from onblur of input because it was causing the search results to disappear when clicked
   const handleSearchResultsVisibility = () => {
     setIsSearchResultVisible(false);
   };
