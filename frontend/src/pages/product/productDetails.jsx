@@ -43,6 +43,36 @@ export function ProductDetails() {
     fetchProductDetails();
   }, []);
 
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "user/cart",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          ErrorAlert(data.error);
+          return;
+        }
+        if (data.cart.some((item) => item._id === id)) {
+          setAddedToCart(true);
+          setQuantity(data.cart.find((item) => item._id === id).quantity);
+        }
+      } catch (error) {
+        ErrorAlert("An error occurred while fetching cart items");
+        console.log(error);
+      }
+    };
+    fetchCartItems();
+  }, []);
+
   const handleRemoveItem = async () => {
     try {
       setRemovingFromCart(true);
@@ -157,7 +187,7 @@ export function ProductDetails() {
                     addingToCart && "opacity-50 cursor-not-allowed"
                   }`}
                   onClick={handleRemoveItem}
-                  disabled={addingToCart}
+                  disabled={addingToCart || removingFromCart}
                 >
                   -
                 </div>
@@ -169,7 +199,7 @@ export function ProductDetails() {
                     addingToCart && "opacity-50 cursor-not-allowed"
                   }`}
                   onClick={handleAddItem}
-                  disabled={addingToCart}
+                  disabled={addingToCart || removingFromCart}
                 >
                   +
                 </div>

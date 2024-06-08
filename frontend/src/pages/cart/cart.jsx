@@ -28,6 +28,7 @@ export function Cart() {
         if (data.error) {
           ErrorAlert(data.error);
         }
+        setCartItems(data.cart);
       } catch (error) {
         ErrorAlert("An error occurred while fetching cart items");
         console.log(error);
@@ -49,7 +50,7 @@ export function Cart() {
     <Loader />
   ) : (
     <div className="flex flex-col min-h-[100dvh]">
-      <Header redirectTo={"/cart"} quantity={cartItems?.length} />
+      <Header redirectTo={"/cart"} />
       {cartItems && cartItems.length > 0 ? (
         <main className="flex justify-center py-8 md:py-12 lg:py-16">
           <div className="container px-4 md:px-6">

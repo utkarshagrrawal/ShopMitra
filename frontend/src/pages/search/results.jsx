@@ -63,7 +63,7 @@ export function SearchResults() {
   return !searching ? (
     <>
       <Header searchQuery={searchQuery.get("q")} />
-      <div className="grid grid-cols-[300px_1fr] gap-4 p-4">
+      <div className="grid lg:grid-cols-[300px_1fr] gap-4 p-4">
         <div className="p-6 h-max bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">
             Search Results for:{" "}
@@ -105,7 +105,7 @@ export function SearchResults() {
             </div>
           </div>
         </div>
-        <div className="mx-4 flex flex-col">
+        <div className="flex flex-col">
           {results.map((product) => (
             <Product key={product._id} product={product} />
           ))}
