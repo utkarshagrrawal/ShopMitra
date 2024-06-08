@@ -124,9 +124,33 @@ const addRemoveProductToCartLogic = async (query, user) => {
   }
 };
 
+const removeItemFromCartLogic = async (query, user) => {
+  const { productId } = query;
+  const { email } = user;
+
+  try {
+    const isProductInCart = await Cart.findOne({
+      email: email,
+      products: { $elemMatch: { product: productId } },
+    });
+    if (isProductInCart && isProductInCart.products[0].quantity >= 1) {
+      await Cart.updateOne(
+        { email: email, products: { $elemMatch: { product: productId } } },
+        { $pull: { products: { product: productId } } }
+      );
+      return { message: "Product removed from cart" };
+    } else {
+      return { message: "Product not in cart" };
+    }
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
   fetchProductDetailsLogic,
   addRemoveProductToCartLogic,
+  removeItemFromCartLogic,
 };

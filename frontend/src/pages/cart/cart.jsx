@@ -3,6 +3,8 @@ import Header from "../../layouts/header";
 import { ErrorAlert } from "../../global/alerts";
 import Footer from "../../layouts/footer";
 import { CartItemCard } from "./cartItemCard";
+import Loader from "../../components/loader";
+import emptyCartLogo from "../../assets/empty-cart.jpg";
 
 export function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -26,13 +28,14 @@ export function Cart() {
         if (data.error) {
           ErrorAlert(data.error);
         }
-        setCartItems(data.cart);
       } catch (error) {
+        ErrorAlert("An error occurred while fetching cart items");
         console.log(error);
       }
+      setLoading(false);
     };
     fetchCartItems();
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     let total = 0;
@@ -42,13 +45,12 @@ export function Cart() {
     setTotalAmount(total);
   }, [cartItems]);
 
-  return (
-    <>
-      <div className="flex flex-col min-h-[100dvh]">
-        <Header
-          redirectTo={"signin?redirectTo=" + encodeURIComponent("/cart")}
-          quantity={cartItems?.length}
-        />
+  return loading ? (
+    <Loader />
+  ) : (
+    <div className="flex flex-col min-h-[100dvh]">
+      <Header redirectTo={"/cart"} quantity={cartItems?.length} />
+      {cartItems && cartItems.length > 0 ? (
         <main className="flex justify-center py-8 md:py-12 lg:py-16">
           <div className="container px-4 md:px-6">
             <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
@@ -118,8 +120,28 @@ export function Cart() {
             </div>
           </div>
         </main>
-        <Footer />
-      </div>
-    </>
+      ) : (
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="flex flex-col items-center gap-4">
+            <img
+              src={emptyCartLogo}
+              alt="Empty cart"
+              className="w-48 h-48 object-contain mix-blend-multiply"
+            />
+            <h1 className="text-2xl font-bold">Your cart is empty</h1>
+            <p className="text-gray-500">
+              Looks like you haven't added anything.
+            </p>
+            <button
+              className="border border-gray-300 bg-gray-100 hover:bg-gray-200 transition-colors duration-300 rounded-lg py-2 px-4"
+              onClick={() => (location.href = "/")}
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      )}
+      <Footer />
+    </div>
   );
 }

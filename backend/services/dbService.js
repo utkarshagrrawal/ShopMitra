@@ -8,4 +8,8 @@ async function main() {
     .catch((err) => console.log(err));
 }
 
-module.exports = main;
+function checkMongoDBConnection() {
+  return mongoose.connection.readyState;
+}
+
+module.exports = { main, checkMongoDBConnection };

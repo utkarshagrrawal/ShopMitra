@@ -20,12 +20,14 @@ export default function Landing() {
               elevate your lifestyle. Explore our collection and find your new
               favorites.
             </p>
-            <button className="mt-4 px-4 py-2 bg-black text-white rounded-md">
-              Explore Products
-            </button>
-            <button className="mt-4 px-4 py-2 border text-black rounded-md ml-4">
-              Learn More
-            </button>
+            <div className="flex gap-4 mt-8">
+              <button className="px-4 py-2 bg-black text-white rounded-md">
+                Explore Products
+              </button>
+              <button className="px-4 py-2 border text-black rounded-md ml-4">
+                Learn More
+              </button>
+            </div>
           </div>
           <div>
             <img
