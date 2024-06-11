@@ -5,11 +5,13 @@ import Footer from "../../layouts/footer";
 import { CartItemCard } from "./cartItemCard";
 import Loader from "../../components/loader";
 import emptyCartLogo from "../../assets/empty-cart.jpg";
+import { useNavigate } from "react-router-dom";
 
 export function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -78,7 +80,7 @@ export function Cart() {
                     )
                 )}
               </div>
-              <div className="space-y-6 bg-gray-100 p-6 rounded-lg">
+              <div className="space-y-6 bg-gray-100 h-fit p-6 rounded-lg">
                 <div>
                   <h2 className="text-lg font-bold">Order Summary</h2>
                   <p className="text-gray-500">Review your order details.</p>
@@ -106,13 +108,13 @@ export function Cart() {
                 <div className="flex flex-col gap-2">
                   <button
                     className="w-full border border-gray-300 rounded-lg py-2"
-                    onClick={() => (location.href = "/")}
+                    onClick={() => navigate("/")}
                   >
                     Continue Shopping
                   </button>
                   <button
                     className="w-full border bg-black text-white rounded-lg py-2"
-                    onClick={() => console.log("hi")}
+                    onClick={() => navigate("/checkout")}
                   >
                     Proceed to Checkout
                   </button>

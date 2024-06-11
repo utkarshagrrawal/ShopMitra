@@ -4,6 +4,7 @@ const {
   fetchProductDetailsLogic,
   addRemoveProductToCartLogic,
   removeItemFromCartLogic,
+  checkoutLogic,
 } = require("../businessLogic/productLogic");
 
 const fetchProductsController = async (req, res) => {
@@ -51,10 +52,21 @@ const removeItemFromCartController = async (req, res) => {
   return res.status(200).json({ message: response.message });
 };
 
+const checkoutController = async (req, res) => {
+  const response = await checkoutLogic(req.user.payload, req.body);
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res
+    .status(200)
+    .json({ sessionId: response.sessionId, orderId: response.orderId });
+};
+
 module.exports = {
   fetchProductsController,
   addProductToWishlistController,
   fetchProductDetailsController,
   addRemoveProductToCartController,
   removeItemFromCartController,
+  checkoutController,
 };

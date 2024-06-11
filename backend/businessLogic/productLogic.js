@@ -1,6 +1,10 @@
 const { Product } = require("../models/productModel");
 const { Wishlist } = require("../models/wishlistModel");
 const { Cart } = require("../models/cartModel");
+const { Order } = require("../models/orderModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { v4: uuidv4 } = require("uuid");
+const mongoose = require("mongoose");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
@@ -147,10 +151,83 @@ const removeItemFromCartLogic = async (query, user) => {
   }
 };
 
+const isOrderIdDuplicate = async (orderId) => {
+  const order = await Order.findOne({ orderId });
+  if (order) {
+    return true;
+  }
+  return false;
+};
+
+const createOrderId = async () => {
+  let orderId = uuidv4();
+  if (await isOrderIdDuplicate(orderId)) {
+    return createOrderId();
+  }
+  return orderId;
+};
+
+const checkoutLogic = async (user, body) => {
+  const { email } = user;
+  const { totalPrice } = body;
+
+  try {
+    const cart = await Cart.findOne({ email: email });
+    if (!cart) {
+      return { error: "Cart is empty" };
+    } else if (cart.products.length === 0) {
+      return { error: "Cart is empty" };
+    }
+    const lineItems = await Promise.all(
+      cart.products.map(async (product) => {
+        const productDetails = await Product.findById(product.product);
+        return {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: productDetails.title,
+              images: [productDetails.imgUrl],
+            },
+            unit_amount_decimal: (Number(totalPrice) * 100).toFixed(2),
+          },
+          quantity: product.quantity,
+        };
+      })
+    );
+    let orderId = await createOrderId();
+    const order = await Order.create({
+      orderId,
+      email: email,
+      products: cart.products,
+      total: totalPrice,
+      status: "pending",
+    });
+    if (!order) {
+      return { error: "An error occurred while creating order" };
+    }
+    const session = await stripe.checkout.sessions.create({
+      customer_email: email,
+      line_items: lineItems,
+      mode: "payment",
+      success_url:
+        process.env.STRIPE_SUCCESS_URL +
+        `?orderId=${decodeURIComponent(orderId)}`,
+      cancel_url:
+        process.env.STRIPE_CANCEL_URL +
+        `?orderId=${decodeURIComponent(orderId)}`,
+    });
+    return { sessionId: session.id };
+  } catch (error) {
+    console.log(error);
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
   fetchProductDetailsLogic,
   addRemoveProductToCartLogic,
   removeItemFromCartLogic,
+  checkoutLogic,
 };

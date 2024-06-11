@@ -1,4 +1,5 @@
 const { Cart } = require("../models/cartModel");
+const { Order } = require("../models/orderModel");
 const { Product } = require("../models/productModel");
 const { User } = require("../models/userModel");
 const { Wishlist } = require("../models/wishlistModel");
@@ -114,12 +115,43 @@ const fetchUserCartLogic = async (user) => {
         cart.products.map(async (product) => {
           const productDetails = await Product.findOne({
             _id: product.product,
-          });
-          products.push({ ...productDetails._doc, quantity: product.quantity });
+          }).lean();
+          products.push({ ...productDetails, quantity: product.quantity });
         })
       );
     }
     return { cart: products };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const fetchUserOrdersLogic = async (user, query) => {
+  const { email } = user;
+  const limit = 3;
+  const { page } = query;
+  const skip = (page - 1) * limit;
+  try {
+    const orders = await Order.find({ email })
+      .sort({ _id: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    const totalOrders = await Order.find({ email }).count();
+    let orderDetails = await Promise.all(
+      orders.map(async (order) => {
+        let products = await Promise.all(
+          order.products.map(async (product) => {
+            const productDetails = await Product.findOne({
+              _id: product.product,
+            }).lean();
+            return { ...productDetails };
+          })
+        );
+        return { order, products };
+      })
+    );
+    return { orders: orderDetails, totalOrders };
   } catch (error) {
     return { error: error };
   }
@@ -132,4 +164,5 @@ module.exports = {
   deleteUserLogic,
   fetchUserWislistLogic,
   fetchUserCartLogic,
+  fetchUserOrdersLogic,
 };

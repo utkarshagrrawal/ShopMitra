@@ -30,6 +30,14 @@ export function Profile() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [orderPage, setOrderPage] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const dateTimeFormatter = Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -47,6 +55,7 @@ export function Profile() {
         if (data.error === "Unauthorized") {
           localStorage.removeItem("token");
           ErrorAlert("You are not logged in. Please login to view this page.");
+          window.location.href = "/";
         }
         ErrorAlert(data.error);
       } else {
@@ -88,6 +97,38 @@ export function Profile() {
     };
     fetchWishlist();
   }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "user/orders?page=" + orderPage,
+          {
+            method: "GET",
+            headers: {
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        console.log(data);
+        if (data.error) {
+          ErrorAlert(data.error);
+        } else {
+          setOrdersLoading(false);
+          if (orderPage === 1) setOrders(data.orders);
+          else {
+            setTotalOrders(data.totalOrders);
+            setOrders([...orders, ...data.orders]);
+          }
+        }
+      } catch (error) {
+        ErrorAlert("An error occurred while fetching orders");
+        console.log(error);
+      }
+    };
+    fetchOrders();
+  }, [orderPage]);
 
   const handleNewProfileDetails = (e) => {
     setUserProfileData({ ...userProfileData, [e.target.name]: e.target.value });
@@ -348,104 +389,144 @@ export function Profile() {
             <div>
               <h3 className="text-lg font-semibold">Orders</h3>
               <div className="mt-4 grid gap-4">
-                <div className="border rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium hover:underline hover:cursor-pointer text-blue-600">
-                      Order #12345
+                {ordersLoading ? (
+                  <div className="animate-pulse">
+                    <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
+                    <div className="h-4 bg-gray-300 rounded-md"></div>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="text-gray-500 text-center">
+                    No orders found
+                  </div>
+                ) : (
+                  orders.map((order, i) => (
+                    <div
+                      key={i}
+                      className="p-4 border border-gray-200 rounded-lg mb-1"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-medium text-blue-600 hover:underline hover:cursor-pointer">
+                          Order #{order.order.orderId}
+                        </div>
+                        <div className="text-sm font-semibold text-green-500">
+                          {order.status}
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-500 mb-4">
+                        Placed on{" "}
+                        {dateTimeFormatter.format(
+                          new Date(order.order.createdAt)
+                        )}
+                      </div>
+                      <div className="grid gap-4 border-t border-gray-200 pt-4">
+                        {order.order.products.map((product, i) => (
+                          <div
+                            className="flex items-center justify-between"
+                            key={i}
+                          >
+                            <div className="text-sm font-medium text-gray-700 text-clip">
+                              {
+                                order.products.find(
+                                  (item) => item._id === product.product
+                                ).title
+                              }
+                              ...
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              x{" "}
+                              {
+                                order.order.products.find(
+                                  (item) => item.product === product.product
+                                ).quantity
+                              }
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 text-right text-sm font-semibold text-gray-800">
+                        Total: ${order.order.total}
+                      </div>
                     </div>
-                    <div className="text-sm text-green-500">Delivered</div>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    Placed on June 15, 2023
-                  </div>
-                  <div className="mt-4 grid gap-2">
-                    <div className="flex items-center justify-between">
-                      <div>Wireless Headphones</div>
-                      <div>x1</div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>Leather Wallet</div>
-                      <div>x1</div>
-                    </div>
-                  </div>
-                  <div className="mt-4 text-right text-sm font-medium">
-                    Total: ₹149.99
-                  </div>
-                </div>
-                <div className="border rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium hover:underline hover:cursor-pointer text-blue-600">
-                      Order #54321
-                    </div>
-                    <div className="text-sm text-yellow-500">Processing</div>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    Placed on May 30, 2023
-                  </div>
-                  <div className="mt-4 grid gap-2">
-                    <div className="flex items-center justify-between">
-                      <div>Outdoor Backpack</div>
-                      <div>x1</div>
-                    </div>
-                  </div>
-                  <div className="mt-4 text-right text-sm font-medium">
-                    Total: ₹79.99
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
-              <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4">
+              <div
+                className={`flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4 ${
+                  totalOrders >= 3 && "hidden"
+                }`}
+                onClick={() => setOrderPage(orderPage + 1)}
+              >
                 <div className="text-sm font-medium">View more</div>
                 <ChevronDownIcon />
               </div>
             </div>
             <div>
               <h3 className="text-lg font-semibold">Wishlist</h3>
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {wishlistLoading
-                  ? [...Array(3)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
-                      >
-                        <div className="animate-pulse">
-                          <div className="bg-gray-300 object-contain w-full h-48"></div>
-                          <div className="bg-white p-4">
-                            <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
-                            <div className="space-y-2">
-                              <div className="h-4 bg-gray-300 rounded-md"></div>
-                              <div className="h-4 bg-gray-300 rounded-md"></div>
-                              <div className="h-4 bg-gray-300 rounded-md"></div>
-                            </div>
-                            <div className="mt-2 h-6 bg-gray-300 rounded-md"></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  : wishlist.map((product, i) => (
-                      <div
-                        key={i}
-                        className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
-                      >
-                        <img
-                          alt="Product 1"
-                          className="object-contain w-full h-32"
-                          src={product.imgUrl}
-                        />
+              <div
+                className={`mt-4 ${
+                  wishlist.length > 0 ||
+                  (wishlistLoading &&
+                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4")
+                }`}
+              >
+                {wishlistLoading ? (
+                  [...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
+                    >
+                      <div className="animate-pulse">
+                        <div className="bg-gray-300 object-contain w-full h-48"></div>
                         <div className="bg-white p-4">
-                          <p className="text-sm text-gray-500">
-                            {product.title}
-                          </p>
-                          <div className="mt-2 text-sm font-medium">
-                            <span>$</span> {product.price}
-                            {product.listPrice > product.price && (
-                              <span className="text-gray-500 line-through ml-2">
-                                {product.listPrice}
-                              </span>
-                            )}
+                          <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-300 rounded-md"></div>
+                            <div className="h-4 bg-gray-300 rounded-md"></div>
+                            <div className="h-4 bg-gray-300 rounded-md"></div>
                           </div>
+                          <div className="mt-2 h-6 bg-gray-300 rounded-md"></div>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))
+                ) : wishlist.length === 0 ? (
+                  <div className="border rounded-lg p-4 shadow-sm">
+                    <div className="text-gray-500 text-center">
+                      No items in wishlist
+                    </div>
+                  </div>
+                ) : (
+                  wishlist.map((product, i) => (
+                    <div
+                      key={i}
+                      className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"
+                    >
+                      <img
+                        alt="Product 1"
+                        className="object-contain w-full h-32"
+                        src={product.imgUrl}
+                      />
+                      <div
+                        className="bg-white p-4 hover:cursor-pointer"
+                        onClick={() =>
+                          (location.href = "/product/" + product._id)
+                        }
+                      >
+                        <p className="text-sm text-gray-500 hover:underline">
+                          {product.title}
+                        </p>
+                        <div className="mt-2 text-sm font-medium">
+                          <span>$</span> {product.price}
+                          {product.listPrice > product.price && (
+                            <span className="text-gray-500 line-through ml-2">
+                              {product.listPrice}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
               {!wishlistLoading && wishlist.length > 3 && (
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4">
