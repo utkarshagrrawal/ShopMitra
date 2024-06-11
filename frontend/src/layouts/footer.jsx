@@ -19,28 +19,22 @@ export default function Footer() {
           <h3 className="text-lg font-bold">Quick Links</h3>
           <nav className="space-y-2 flex flex-col">
             <Link
-              href="#"
+              to="/"
               className="text-gray-400 hover:text-white transition-colors"
             >
               Home
             </Link>
             <Link
-              href="#"
+              to="/results?q=shirts"
               className="text-gray-400 hover:text-white transition-colors"
             >
               Shop
             </Link>
             <Link
-              href="#"
+              to="/about"
               className="text-gray-400 hover:text-white transition-colors"
             >
               About
-            </Link>
-            <Link
-              href="#"
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              Contact
             </Link>
           </nav>
         </div>
