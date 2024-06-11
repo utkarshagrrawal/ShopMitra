@@ -5,6 +5,7 @@ const {
   notificationPreferencesUpdateLogic,
   fetchUserWislistLogic,
   fetchUserCartLogic,
+  fetchUserOrdersLogic,
 } = require("../businessLogic/userLogic");
 
 const updateUserProfileController = async (req, res) => {
@@ -58,6 +59,16 @@ const fetchUserCartController = async (req, res) => {
   return res.status(200).json({ cart: response.cart });
 };
 
+const fetchUserOrdersController = async (req, res) => {
+  const response = await fetchUserOrdersLogic(req.user.payload, req.query);
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res
+    .status(200)
+    .json({ orders: response.orders, totalOrders: response.totalOrders });
+};
+
 module.exports = {
   updateUserProfileController,
   changeUserPasswordController,
@@ -65,4 +76,5 @@ module.exports = {
   deleteUserController,
   fetchUserWislistController,
   fetchUserCartController,
+  fetchUserOrdersController,
 };

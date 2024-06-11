@@ -6,6 +6,7 @@ const {
   notificationPreferencesUpdateController,
   fetchUserWislistController,
   fetchUserCartController,
+  fetchUserOrdersController,
 } = require("../controllers/userController");
 const { authenticate } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -20,5 +21,6 @@ router.put(
 router.delete("/delete", authenticate, deleteUserController);
 router.get("/wishlist", authenticate, fetchUserWislistController);
 router.get("/cart", authenticate, fetchUserCartController);
+router.get("/orders", authenticate, fetchUserOrdersController);
 
 module.exports = router;

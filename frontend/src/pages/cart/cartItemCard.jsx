@@ -139,7 +139,9 @@ export function CartItemCard(props) {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">${props?.productPrice || 0}</p>
+          <p className="text-gray-500">
+            ${props?.productPrice || 0} x {props?.productQuantity}
+          </p>
           <p className="font-medium">
             $
             {props?.productPrice

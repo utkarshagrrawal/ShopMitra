@@ -12,6 +12,9 @@ import { SearchResults } from "./pages/search/results";
 import { ProductDetails } from "./pages/product/productDetails";
 import { useEffect } from "react";
 import { Cart } from "./pages/cart/cart";
+import { CheckoutPage } from "./pages/checkout/checkoutPage";
+import { PaymentSuccess } from "./pages/checkout/paymentSuccess";
+import { PaymentFailed } from "./pages/checkout/paymentFailed";
 
 function App() {
   const { toasts } = useToasterStore();
@@ -35,6 +38,9 @@ function App() {
         <Route path="/dashboard/:section" element={<Profile />}></Route>
         <Route path="/results" element={<SearchResults />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
+        <Route path="/checkout" element={<CheckoutPage />}></Route>
+        <Route path="/payment-success" element={<PaymentSuccess />}></Route>
+        <Route path="/payment-failed" element={<PaymentFailed />}></Route>
         <Route path="/product/:id" element={<ProductDetails />}></Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
