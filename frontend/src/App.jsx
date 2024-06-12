@@ -15,7 +15,8 @@ import { Cart } from "./pages/cart/cart";
 import { CheckoutPage } from "./pages/checkout/checkoutPage";
 import { PaymentSuccess } from "./pages/checkout/paymentSuccess";
 import { PaymentFailed } from "./pages/checkout/paymentFailed";
-import { AboutPage } from "./pages/about/about";
+import { AboutPage } from "./pages/about";
+import { LearnMorePage } from "./pages/learnMore";
 
 function App() {
   const { toasts } = useToasterStore();
@@ -44,6 +45,7 @@ function App() {
         <Route path="/payment-failed" element={<PaymentFailed />}></Route>
         <Route path="/product/:id" element={<ProductDetails />}></Route>
         <Route path="/about" element={<AboutPage />}></Route>
+        <Route path="/learn-more" element={<LearnMorePage />}></Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </Router>
