@@ -2,7 +2,10 @@ import React from "react";
 
 export function ProductCard(props) {
   return (
-    <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow-sm mb-2 p-6">
+    <div
+      className="flex flex-col items-center bg-white border border-gray-200 rounded-lg hover:cursor-pointer shadow-sm mb-2 p-6"
+      onClick={props?.onClick}
+    >
       <img
         src={props?.productImage}
         alt="product"

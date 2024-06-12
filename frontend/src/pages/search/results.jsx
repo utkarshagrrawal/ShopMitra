@@ -15,6 +15,9 @@ export function SearchResults() {
 
   useEffect(() => {
     const query = searchQuery.get("q");
+    if (!query) {
+      location.href = "/";
+    }
     const fetchResults = async () => {
       setLoading(true);
       try {

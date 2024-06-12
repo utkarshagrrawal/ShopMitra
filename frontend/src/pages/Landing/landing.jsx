@@ -21,10 +21,16 @@ export default function Landing() {
               favorites.
             </p>
             <div className="flex gap-4 mt-8">
-              <button className="px-4 py-2 bg-black text-white rounded-md">
+              <button
+                className="px-4 py-2 bg-black text-white rounded-md"
+                onClick={() => (location.href = "/results?q=tv")}
+              >
                 Explore Products
               </button>
-              <button className="px-4 py-2 border text-black rounded-md ml-4">
+              <button
+                className="px-4 py-2 border text-black rounded-md ml-4"
+                onClick={() => (location.href = "/learn-more")}
+              >
                 Learn More
               </button>
             </div>
@@ -54,6 +60,7 @@ export default function Landing() {
               <ProductCard
                 productName={"Apple Macbook Pro"}
                 productPrice={"999"}
+                onClick={() => (location.href = "/results?q=macbook")}
                 productImage={
                   "https://www.apple.com/v/macbook-pro/ak/images/overview/welcome/welcome_hero_endframe__66ipqm3o5gyu_large_2x.jpg"
                 }
@@ -61,6 +68,9 @@ export default function Landing() {
               <ProductCard
                 productName={"Samsung Galaxy S24"}
                 productPrice={"899"}
+                onClick={() =>
+                  (location.href = "/results?q=samsung%20galaxy%20s24")
+                }
                 productImage={
                   "https://f.media-amazon.com/images/I/71yliZMICyL._SX679_.jpg"
                 }
@@ -68,6 +78,7 @@ export default function Landing() {
               <ProductCard
                 productName={"H&M T-shirt"}
                 productPrice={"100"}
+                onClick={() => (location.href = "/results?q=tshirt")}
                 productImage={
                   "https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/28097534/2024/4/5/ae488804-3387-4d5e-8e11-cc5d215a37191712302483540HMMenPureCottonRegularFitT-shirt1.jpg"
                 }
