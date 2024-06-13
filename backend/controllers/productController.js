@@ -26,11 +26,16 @@ const addProductToWishlistController = async (req, res) => {
 };
 
 const fetchProductDetailsController = async (req, res) => {
-  const response = await fetchProductDetailsLogic(req.params);
+  const response = await fetchProductDetailsLogic(req.params, req.user.payload);
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
-  return res.status(200).json({ product: response.product });
+  return res
+    .status(200)
+    .json({
+      product: response.product,
+      isProductInWishlist: response.isProductInWishlist,
+    });
 };
 
 const addRemoveProductToCartController = async (req, res) => {

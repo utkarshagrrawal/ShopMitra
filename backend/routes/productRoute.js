@@ -23,6 +23,6 @@ router.delete(
   removeItemFromCartController
 );
 router.post("/checkout", authenticate, checkoutController);
-router.get("/:id", fetchProductDetailsController);
+router.get("/:id", authenticate, fetchProductDetailsController);
 
 module.exports = router;

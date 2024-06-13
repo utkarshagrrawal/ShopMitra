@@ -1,33 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Rating } from "../../components/rating";
 import { FavouriteIcon } from "../../components/favouriteIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 
 export function Product(props) {
-  const [liked, setLiked] = useState(false);
-
-  const handleLikeProduct = async () => {
-    setLiked(!liked);
-    const response = await fetch(
-      import.meta.env.VITE_BACKEND_URL +
-        "products/add-to-wishlist?productId=" +
-        props.product?._id,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token"),
-        },
-      }
-    );
-    const data = await response.json();
-    if (data.error) {
-      ErrorAlert(data.error);
-    } else {
-      SuccessAlert(data.message);
-    }
-  };
-
   const handleAddToCart = async (id) => {
     try {
       const response = await fetch(
@@ -95,15 +71,6 @@ export function Product(props) {
                 ({props.product.reviews} reviews)
               </span>
             </div>
-            <button
-              className="ml-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-              onClick={handleLikeProduct}
-            >
-              <FavouriteIcon
-                fill={liked ? "red" : "none"}
-                stroke={liked ? "red" : "currentColor"}
-              />
-            </button>
           </div>
           <div className="flex items-center justify-between mt-4">
             <button

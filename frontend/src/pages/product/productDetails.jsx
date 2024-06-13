@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../layouts/header";
 import { useParams } from "react-router-dom";
-import { ErrorAlert } from "../../global/alerts";
+import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import Loader from "../../components/loader";
 import { StarIcon } from "../../components/starIcon";
 import { Comments } from "./comments";
+import InfoIcon from "../../components/infoIcon";
 
 export function ProductDetails() {
   const { id } = useParams();
@@ -14,6 +15,30 @@ export function ProductDetails() {
   const [productDetails, setProductDetails] = useState({});
   const [addedToCart, setAddedToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [liked, setLiked] = useState(false);
+
+  const handleLikeProduct = async () => {
+    setLiked(!liked);
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL +
+        "products/add-to-wishlist?productId=" +
+        id,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token"),
+        },
+      }
+    );
+    const data = await response.json();
+    if (data.error) {
+      setLiked(!liked);
+      ErrorAlert(data.error);
+    } else {
+      SuccessAlert(data.message);
+    }
+  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -36,6 +61,9 @@ export function ProductDetails() {
         }
         setLoading(false);
         setProductDetails(data.product);
+        setLiked(
+          data.isProductInWishlist.products.some((item) => item.product === id)
+        );
       } catch (error) {
         console.log(error);
       }
@@ -158,11 +186,26 @@ export function ProductDetails() {
             <p className="text-lg text-gray-700">
               {productDetails?.description}
             </p>
-            <div className="flex gap-2 items-center">
-              <span className="text-2xl font-bold text-gray-800">
-                ${productDetails?.price}
-              </span>
-              <span className="text-lg text-gray-600">/ per item</span>
+            <div className="flex gap-2 items-center justify-between">
+              <div>
+                <span className="text-2xl font-bold text-gray-800">
+                  ${productDetails?.price}
+                </span>
+                <span className="text-lg text-gray-600">/ per item</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-md ${
+                    liked
+                      ? "bg-red-500 text-white hover:bg-red-600"
+                      : "bg-blue-500 text-white hover:bg-blue-600"
+                  }`}
+                  onClick={handleLikeProduct}
+                >
+                  {liked && <InfoIcon className="w-5 h-5" />}
+                  {liked ? "Remove from Wishlist" : "Add to Wishlist"}
+                </button>
+              </div>
             </div>
             {productDetails?.listPrice > productDetails?.price && (
               <div className="flex gap-2 items-center">
@@ -181,7 +224,7 @@ export function ProductDetails() {
               </div>
             )}
             {addedToCart ? (
-              <div className="flex items-center border rounded-full overflow-hidden shadow-lg">
+              <div className="flex items-center border rounded-md overflow-hidden shadow-lg">
                 <div
                   className={`px-4 py-3 w-full text-white text-center bg-blue-600 hover:bg-blue-700 hover:cursor-pointer transition duration-300 ${
                     addingToCart && "opacity-50 cursor-not-allowed"
@@ -206,7 +249,7 @@ export function ProductDetails() {
               </div>
             ) : (
               <button
-                className={`bg-blue-600 text-white px-8 py-3 rounded-full font-medium shadow-lg hover:bg-blue-700 transition duration-300 ${
+                className={`bg-blue-600 text-white px-8 py-3 rounded-md font-medium shadow-lg hover:bg-blue-700 transition duration-300 ${
                   addingToCart && "opacity-50 cursor-not-allowed"
                 }`}
                 onClick={handleAddItem}
