@@ -470,9 +470,8 @@ export function Profile() {
               <h3 className="text-lg font-semibold">Wishlist</h3>
               <div
                 className={`mt-4 ${
-                  wishlist.length > 0 ||
-                  (wishlistLoading &&
-                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4")
+                  (wishlist.length > 0 || wishlistLoading) &&
+                  "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                 }`}
               >
                 {wishlistLoading ? (

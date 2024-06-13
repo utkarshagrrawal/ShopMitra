@@ -62,11 +62,16 @@ const addProductToWishlistLogic = async (query, user) => {
   }
 };
 
-const fetchProductDetailsLogic = async (params) => {
+const fetchProductDetailsLogic = async (params, user) => {
+  const { email } = user;
   const { id } = params;
   try {
     const product = await Product.findOne({ _id: id });
-    return { product };
+    const isProductInWishlist = await Wishlist.findOne({
+      products: { $elemMatch: { product: id } },
+      email: email,
+    });
+    return { product, isProductInWishlist };
   } catch (error) {
     return { error: error };
   }
