@@ -109,7 +109,6 @@ export default function SearchBar(props) {
                 key={result._id}
                 onClick={() => {
                   location.href = "/product/" + result._id;
-                  console.log("yes");
                 }}
                 className="flex items-center gap-2 hover:cursor-pointer hover:bg-gray-100 p-2 rounded-md"
               >
