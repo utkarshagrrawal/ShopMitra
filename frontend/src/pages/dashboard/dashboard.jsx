@@ -111,14 +111,14 @@ export function Profile() {
           }
         );
         const data = await response.json();
-        console.log(data);
         if (data.error) {
           ErrorAlert(data.error);
         } else {
           setOrdersLoading(false);
-          if (orderPage === 1) setOrders(data.orders);
-          else {
+          if (orderPage === 1) {
             setTotalOrders(data.totalOrders);
+            setOrders(data.orders);
+          } else {
             setOrders([...orders, ...data.orders]);
           }
         }
@@ -458,7 +458,7 @@ export function Profile() {
               </div>
               <div
                 className={`flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4 ${
-                  totalOrders >= 3 && "hidden"
+                  totalOrders <= orderPage * 3 && "hidden"
                 }`}
                 onClick={() => setOrderPage(orderPage + 1)}
               >
