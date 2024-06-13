@@ -150,7 +150,7 @@ export function CartItemCard(props) {
           </p>
         </div>
         <button
-          className="w-full bg-gray-200 hover:bg-gray-300 transition-colors ease-in-out duration-300 rounded-md py-2 text-base"
+          className="w-fit px-2 place-self-end text-white bg-red-500 hover:bg-red-600 transition-colors ease-in-out duration-300 rounded-md py-2 text-base"
           onClick={handleRemoveItem}
         >
           Remove

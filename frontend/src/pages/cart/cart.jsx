@@ -59,7 +59,9 @@ export function Cart() {
             <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
               <div className="space-y-8">
                 <div>
-                  <h1 className="text-2xl font-bold">Your Cart</h1>
+                  <h1 className="text-2xl font-bold">
+                    Your Cart ({cartItems.length} products)
+                  </h1>
                   <p className="text-gray-500">
                     Review the items in your cart and proceed to checkout.
                   </p>
