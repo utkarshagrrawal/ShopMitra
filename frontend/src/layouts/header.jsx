@@ -3,6 +3,7 @@ import SearchBar from "./searchBar";
 import { CartIcon } from "../components/cartIcon";
 import { LogoutIcon } from "../components/logoutIcon";
 import Logo from "../components/logo";
+import { ErrorAlert } from "../global/alerts";
 
 export default function Header(props) {
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
@@ -68,6 +69,7 @@ export default function Header(props) {
             (location.href = `/signin?redirectTo=${encodeURIComponent(
               props?.redirectTo
             )}`);
+          return;
         }
         setIsUserSignedIn(false);
       } else {
@@ -93,7 +95,13 @@ export default function Header(props) {
         );
         const data = await response.json();
         if (data.error) {
-          ErrorAlert(data.error);
+          if (data.error === "Unauthorized") {
+            localStorage.removeItem("token");
+            props?.redirectTo &&
+              (location.href = `/signin?redirectTo=${encodeURIComponent(
+                props?.redirectTo
+              )}`);
+          }
           return;
         }
         setCartItemsQuantity(data.cart.length);

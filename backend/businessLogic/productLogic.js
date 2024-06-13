@@ -5,6 +5,7 @@ const { Order } = require("../models/orderModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
+const Review = require("../models/reviewModel");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
@@ -223,6 +224,57 @@ const checkoutLogic = async (user, body) => {
   }
 };
 
+const fetchProductReviewsLogic = async (query, params) => {
+  const { page } = query;
+  const { id } = params;
+  try {
+    const reviews = await Review.find({ productId: id })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * 5)
+      .limit(5);
+    return { reviews };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const isReviewIdDuplicate = async (reviewId) => {
+  const review = await Review.findOne({ reviewId });
+  if (review) {
+    return true;
+  }
+  return false;
+};
+
+const createReviewId = async () => {
+  let reviewId = uuidv4();
+  if (await isReviewIdDuplicate(reviewId)) {
+    return createReviewId();
+  }
+  return reviewId;
+};
+
+const addProductReviewLogic = async (user, body) => {
+  const { email } = user;
+  const { productId, rating, comment } = body;
+  try {
+    const reviewId = await createReviewId();
+    const review = await Review.create({
+      email,
+      reviewId,
+      productId,
+      rating,
+      comment,
+    });
+    if (!review) {
+      return { error: "An error occurred while adding review" };
+    }
+    return { message: "Review added successfully" };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
@@ -230,4 +282,6 @@ module.exports = {
   addRemoveProductToCartLogic,
   removeItemFromCartLogic,
   checkoutLogic,
+  fetchProductReviewsLogic,
+  addProductReviewLogic,
 };

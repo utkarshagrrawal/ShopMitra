@@ -5,6 +5,8 @@ const {
   addRemoveProductToCartLogic,
   removeItemFromCartLogic,
   checkoutLogic,
+  fetchProductReviewsLogic,
+  addProductReviewLogic,
 } = require("../businessLogic/productLogic");
 
 const fetchProductsController = async (req, res) => {
@@ -62,6 +64,22 @@ const checkoutController = async (req, res) => {
     .json({ sessionId: response.sessionId, orderId: response.orderId });
 };
 
+const fetchProductReviewsController = async (req, res) => {
+  const response = await fetchProductReviewsLogic(req.query, req.params);
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res.status(200).json({ reviews: response.reviews });
+};
+
+const addProductReviewController = async (req, res) => {
+  const response = await addProductReviewLogic(req.user.payload, req.body);
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res.status(200).json({ message: response.message });
+};
+
 module.exports = {
   fetchProductsController,
   addProductToWishlistController,
@@ -69,4 +87,6 @@ module.exports = {
   addRemoveProductToCartController,
   removeItemFromCartController,
   checkoutController,
+  fetchProductReviewsController,
+  addProductReviewController,
 };

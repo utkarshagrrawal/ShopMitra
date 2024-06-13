@@ -4,9 +4,7 @@ import { FavouriteIcon } from "../../components/favouriteIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 
 export function Product(props) {
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [quantity, setQuantity] = useState(1);
 
   const handleLikeProduct = async () => {
     setLiked(!liked);
@@ -30,21 +28,30 @@ export function Product(props) {
     }
   };
 
-  const handleAddToCart = (id) => {
-    setIsAddedToCart(true);
-  };
-
-  const handleAddItemToCart = (id) => {
-    console.log(id);
-    setQuantity(quantity + 1);
-  };
-
-  const handleRemoveItemFromCart = (id) => {
-    console.log(id);
-    if (quantity === 1) {
-      setIsAddedToCart(false);
-    } else {
-      setQuantity(quantity - 1);
+  const handleAddToCart = async (id) => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL +
+          "products/add-remove-product-in-cart?productId=" +
+          id +
+          "&operationType=add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        ErrorAlert(data.error);
+      } else {
+        SuccessAlert(data.message);
+      }
+    } catch (error) {
+      ErrorAlert("An error occurred while adding the product to cart");
+      console.log(error);
     }
   };
 
@@ -99,30 +106,12 @@ export function Product(props) {
             </button>
           </div>
           <div className="flex items-center justify-between mt-4">
-            {isAddedToCart ? (
-              <div className="flex items-center border rounded-md overflow-hidden">
-                <div
-                  className="px-2 py-1 bg-gray-100 hover:bg-gray-300 hover:cursor-pointer"
-                  onClick={() => handleRemoveItemFromCart(props.product?._id)}
-                >
-                  -
-                </div>
-                <span className="px-4">{quantity}</span>
-                <div
-                  className="px-2 py-1 bg-gray-100 hover:bg-gray-300 hover:cursor-pointer"
-                  onClick={() => handleAddItemToCart(props.product?._id)}
-                >
-                  +
-                </div>
-              </div>
-            ) : (
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-                onClick={() => handleAddToCart(props.product?._id)}
-              >
-                Add to Cart
-              </button>
-            )}
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+              onClick={() => handleAddToCart(props.product?._id)}
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
