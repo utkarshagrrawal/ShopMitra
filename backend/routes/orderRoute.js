@@ -3,9 +3,11 @@ const { authenticate } = require("../middlewares/authMiddleware");
 const {
   cancelOrderDueToPaymentFailureController,
   processOrderController,
+  fetchOrderDetailsController,
 } = require("../controllers/orderController");
 const router = express.Router();
 
+router.get("/:orderId", authenticate, fetchOrderDetailsController);
 router.delete(
   "/cancel-order",
   authenticate,

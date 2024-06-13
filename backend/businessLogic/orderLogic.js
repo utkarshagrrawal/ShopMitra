@@ -1,5 +1,6 @@
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
+const { Product } = require("../models/productModel");
 
 const cancelOrderDueToPaymentFailureLogic = async (query) => {
   const { orderId } = query;
@@ -42,7 +43,33 @@ const processOrderLogic = async (query) => {
   }
 };
 
+const fetchOrderDetailsLogic = async (params) => {
+  const { orderId } = params;
+  try {
+    const order = await Order.findOne({ orderId }).lean();
+    const orderDetails = await Promise.all(
+      order.products.map(async (product) => {
+        const productDetails = await Product.findOne({
+          _id: product.product,
+        });
+        return {
+          productId: product.product,
+          quantity: product.quantity,
+          productDetails,
+        };
+      })
+    );
+    if (!order) {
+      return { error: "Order not found" };
+    }
+    return { order: order, orderDetails: orderDetails };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   cancelOrderDueToPaymentFailureLogic,
   processOrderLogic,
+  fetchOrderDetailsLogic,
 };

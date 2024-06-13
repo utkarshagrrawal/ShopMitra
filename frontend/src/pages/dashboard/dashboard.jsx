@@ -405,7 +405,13 @@ export function Profile() {
                       className="p-4 border border-gray-200 rounded-lg mb-1"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm font-medium text-blue-600 hover:underline hover:cursor-pointer">
+                        <div
+                          className="text-sm font-medium text-blue-600 hover:underline hover:cursor-pointer"
+                          onClick={() =>
+                            (location.href =
+                              "/order-tracking/" + order.order.orderId)
+                          }
+                        >
                           Order #{order.order.orderId}
                         </div>
                         <div className="text-sm font-semibold text-green-500">
