@@ -1,3 +1,4 @@
+const { User } = require("../models/userModel");
 const { Product } = require("../models/productModel");
 const { Wishlist } = require("../models/wishlistModel");
 const { Cart } = require("../models/cartModel");
@@ -62,16 +63,25 @@ const addProductToWishlistLogic = async (query, user) => {
   }
 };
 
-const fetchProductDetailsLogic = async (params, user) => {
-  const { email } = user;
+const fetchProductDetailsLogic = async (params) => {
   const { id } = params;
   try {
     const product = await Product.findOne({ _id: id });
+    return { product };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const checkIsProductInWishlistLogic = async (params, user) => {
+  const { email } = user;
+  const { id } = params;
+  try {
     const isProductInWishlist = await Wishlist.findOne({
       products: { $elemMatch: { product: id } },
       email: email,
     });
-    return { product, isProductInWishlist };
+    return { isProductInWishlist: isProductInWishlist ? true : false };
   } catch (error) {
     return { error: error };
   }
@@ -261,17 +271,22 @@ const createReviewId = async () => {
 
 const addProductReviewLogic = async (user, body) => {
   const { email } = user;
-  const { productId, rating, comment } = body;
+  const { productId, rating, review } = body;
   try {
     const reviewId = await createReviewId();
-    const review = await Review.create({
+    const userDetails = await User.findOne({ email }).lean();
+    if (!userDetails) {
+      return { error: "User not found" };
+    }
+    const reviewEntry = await Review.create({
+      name: userDetails.name,
       email,
       reviewId,
       productId,
       rating,
-      comment,
+      review,
     });
-    if (!review) {
+    if (!reviewEntry) {
       return { error: "An error occurred while adding review" };
     }
     return { message: "Review added successfully" };
@@ -284,6 +299,7 @@ module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
   fetchProductDetailsLogic,
+  checkIsProductInWishlistLogic,
   addRemoveProductToCartLogic,
   removeItemFromCartLogic,
   checkoutLogic,

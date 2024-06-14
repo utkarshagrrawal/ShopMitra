@@ -5,6 +5,10 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  name: {
+    type: String,
+    required: true,
+  },
   reviewId: {
     type: String,
     required: true,
@@ -17,7 +21,7 @@ const reviewSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  comment: {
+  review: {
     type: String,
     required: true,
   },
