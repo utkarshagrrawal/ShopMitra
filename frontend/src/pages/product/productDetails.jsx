@@ -49,6 +49,7 @@ export function ProductDetails() {
   const [reviews, setReviews] = useState([]);
   const [page, setPage] = useState(1);
   const [averageRating, setAverageRating] = useState(0);
+  const [reviewSectionVisible, setReviewSectionVisible] = useState(false);
 
   const handleLikeProduct = async () => {
     setLiked(!liked);
@@ -294,6 +295,7 @@ export function ProductDetails() {
         return;
       }
       SuccessAlert(data.message);
+      location.reload();
     } catch (error) {
       ErrorAlert("An error occurred while submitting the review");
       console.log(error);
@@ -408,16 +410,30 @@ export function ProductDetails() {
                   : "No ratings yet"}
               </div>
             </div>
-            <div className="w-full mx-auto p-6 bg-white border border-gray-300 rounded-md shadow-sm">
-              <h2 className="text-lg font-semibold mb-4 text-gray-800">
-                Write a Review
-              </h2>
-              <form onSubmit={handleSubmit}>
+            <div className="w-full mx-auto bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div
+                className={`w-full px-4 py-2 text-sm font-medium flex justify-center items-center rounded-t-lg cursor-pointer transition-colors duration-300 ${
+                  reviewSectionVisible
+                    ? "bg-gray-800 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+                onClick={() => setReviewSectionVisible(!reviewSectionVisible)}
+              >
+                {reviewSectionVisible ? "Close" : "Write a Review"}
+              </div>
+              <form
+                onSubmit={handleSubmit}
+                className={`transition-all duration-100 ${
+                  reviewSectionVisible ? "p-6 block" : "hidden"
+                }`}
+              >
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2" htmlFor="rating">
                     Rating:
                   </label>
-                  <StarRating rating={rating} onRatingChange={setRating} />
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={rating} onRatingChange={setRating} />
+                  </div>
                 </div>
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2" htmlFor="review">
@@ -425,15 +441,15 @@ export function ProductDetails() {
                   </label>
                   <textarea
                     id="review"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                    rows="5"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-gray-600 transition-colors duration-300 resize-none"
+                    rows="4"
                     value={review}
                     onChange={(e) => setReview(e.target.value)}
                   ></textarea>
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  className="w-full py-2 px-4 bg-gray-800 text-white font-medium rounded-md hover:bg-gray-900 transition-colors duration-300"
                 >
                   Submit Review
                 </button>

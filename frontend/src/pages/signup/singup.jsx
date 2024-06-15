@@ -11,6 +11,7 @@ export function Signup() {
     password: "",
     name: "",
     gender: "",
+    user_type: "",
     dob: "",
   });
   const [registering, setRegistering] = useState(false);
@@ -53,6 +54,7 @@ export function Signup() {
       !signupDetails.password ||
       !signupDetails.name ||
       !signupDetails.gender ||
+      !signupDetails.user_type ||
       !signupDetails.dob
     ) {
       ErrorAlert("All fields are required");
@@ -92,8 +94,10 @@ export function Signup() {
         password: "",
         name: "",
         gender: "",
+        user_type: "",
         dob: "",
       });
+      location.href = "/signin";
     }
   };
 
@@ -106,13 +110,13 @@ export function Signup() {
         <Logo className="h-6 w-6" />
         <span className="text-lg font-semibold">Shopmitra</span>
       </div>
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-4">
         <div>
           <h1 className="mt-2 text-center text-2xl font-bold tracking-tight text-gray-900">
             Sign Up
           </h1>
         </div>
-        <form onSubmit={handleSignUp} className="mt-8 space-y-6" method="POST">
+        <form onSubmit={handleSignUp} className="mt-8 space-y-4" method="POST">
           <div className="-space-y-px rounded-md shadow-sm">
             <label htmlFor="email">Email address</label>
             <input
@@ -183,6 +187,21 @@ export function Signup() {
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
+            </select>
+          </div>
+          <div className="-space-y-px rounded-md shadow-sm">
+            <label htmlFor="user_type">User type</label>
+            <select
+              id="user_type"
+              name="user_type"
+              value={signupDetails.user_type || ""}
+              onChange={handleSignupDetailsChange}
+              required
+              className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+            >
+              <option value="">Select user type</option>
+              <option value="customer">Customer</option>
+              <option value="seller">Seller</option>
             </select>
           </div>
           <div className="-space-y-px rounded-md shadow-sm">
