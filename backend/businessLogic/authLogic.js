@@ -32,7 +32,7 @@ const loginLogic = async (body) => {
 };
 
 const registerLogic = async (body) => {
-  const { name, email, password, phone, gender, dob } = body;
+  const { name, email, password, phone, gender, user_type, dob } = body;
   const user = await User.find({ email });
   if (user.length > 0) {
     return { error: "User already exists" };
@@ -46,6 +46,7 @@ const registerLogic = async (body) => {
     password: hashedPassword,
     hash_code: salt,
     gender: gender,
+    user_type: user_type,
     date_of_birth: new Date(dob),
   });
   try {

@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
   },
+  user_type: {
+    type: String,
+    required: true,
+  },
   date_of_birth: {
     type: Date,
     required: true,
