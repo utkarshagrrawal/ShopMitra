@@ -18,7 +18,7 @@ Welcome to the **Shopmitra** GitHub repository! Shopmitra is a full-featured e-c
 - Order Management
 - User Profile Management
 - Responsive Design
-- Admin Dashboard for Managing Products and Orders
+- Seller Dashboard for Managing Products and Orders
 
 ## Demo
 You can view the live demo of the Shopmitra application here: [Shopmitra Live Demo](https://shopmitra.vercel.app)
