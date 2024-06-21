@@ -6,7 +6,7 @@ import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import ToggleSwitch from "../../components/toggleButton";
 import DeleteConfirmationModal from "../../layouts/deleteModal";
 
-export function Profile() {
+export function CustomerDashboard() {
   const { section } = useParams();
   const [currentSection, setCurrentSection] = useState(section || "orders");
   const [userProfileData, setUserProfileData] = useState({
@@ -29,6 +29,8 @@ export function Profile() {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [changingPassword, setChangingPassword] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+  const [wishlistPage, setWishlistPage] = useState(1);
+  const [totalWishlist, setTotalWishlist] = useState(0);
   const [wishlistLoading, setWishlistLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
@@ -59,6 +61,9 @@ export function Profile() {
         }
         ErrorAlert(data.error);
       } else {
+        if (data.user.user_type !== "customer") {
+          window.location.href = "/seller/dashboard/statistics";
+        }
         setUserProfileData({
           name: data.user.name,
           email: data.user.email,
@@ -79,7 +84,7 @@ export function Profile() {
   useEffect(() => {
     const fetchWishlist = async () => {
       const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "user/wishlist",
+        import.meta.env.VITE_BACKEND_URL + "user/wishlist?page=" + wishlistPage,
         {
           method: "GET",
           headers: {
@@ -92,11 +97,12 @@ export function Profile() {
         ErrorAlert(data.error);
       } else {
         setWishlistLoading(false);
-        setWishlist(data.wishlist);
+        setWishlist([...wishlist, ...data.wishlist]);
+        setTotalWishlist(data.totalWishlist);
       }
     };
     fetchWishlist();
-  }, []);
+  }, [wishlistPage]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -395,7 +401,7 @@ export function Profile() {
                     <div className="h-4 bg-gray-300 rounded-md"></div>
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="text-gray-500 text-center">
+                  <div className="text-gray-500 border py-4 rounded-lg text-center">
                     No orders found
                   </div>
                 ) : (
@@ -495,10 +501,8 @@ export function Profile() {
                     </div>
                   ))
                 ) : wishlist.length === 0 ? (
-                  <div className="border rounded-lg p-4 shadow-sm">
-                    <div className="text-gray-500 text-center">
-                      No items in wishlist
-                    </div>
+                  <div className="text-gray-500 text-center border rounded-lg p-4">
+                    No items in wishlist
                   </div>
                 ) : (
                   wishlist.map((product, i) => (
@@ -533,8 +537,13 @@ export function Profile() {
                   ))
                 )}
               </div>
-              {!wishlistLoading && wishlist.length > 3 && (
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4">
+              {!wishlistLoading && (
+                <div
+                  className={`flex items-center justify-center bg-gray-100 rounded-lg p-2 hover:bg-gray-200 transition-colors duration-300 ease-in-out hover:cursor-pointer mt-4 ${
+                    wishlistPage * 3 >= totalWishlist && "hidden"
+                  }`}
+                  onClick={() => setWishlistPage((prev) => prev + 1)}
+                >
                   <div className="text-sm font-medium">View more</div>
                   <ChevronDownIcon />
                 </div>

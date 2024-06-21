@@ -6,7 +6,7 @@ import { Signup } from "./pages/signup/singup";
 import toast, { Toaster, useToasterStore } from "react-hot-toast";
 import { ForgotPassword } from "./pages/forgotpwd/forgotPassword";
 import { ResetPassword } from "./pages/forgotpwd/resetPassword";
-import { Profile } from "./pages/dashboard/dashboard";
+import { CustomerDashboard } from "./pages/dashboard/customerDashboard";
 import { NotFound } from "./global/404";
 import { SearchResults } from "./pages/search/results";
 import { ProductDetails } from "./pages/product/productDetails";
@@ -18,6 +18,7 @@ import { PaymentFailed } from "./pages/checkout/paymentFailed";
 import { AboutPage } from "./pages/about";
 import { LearnMorePage } from "./pages/learnMore";
 import { Order } from "./pages/order";
+import { SellerDashboard } from "./pages/dashboard/sellerDashboard";
 
 function App() {
   const { toasts } = useToasterStore();
@@ -38,7 +39,14 @@ function App() {
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route path="/resetpassword" element={<ResetPassword />}></Route>
-        <Route path="/dashboard/:section" element={<Profile />}></Route>
+        <Route
+          path="/dashboard/:section"
+          element={<CustomerDashboard />}
+        ></Route>
+        <Route
+          path="/seller/dashboard/:section"
+          element={<SellerDashboard />}
+        ></Route>
         <Route path="/results" element={<SearchResults />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
         <Route path="/checkout" element={<CheckoutPage />}></Route>

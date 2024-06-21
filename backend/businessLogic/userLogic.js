@@ -84,14 +84,18 @@ const deleteUserLogic = async (user) => {
   }
 };
 
-const fetchUserWislistLogic = async (user) => {
+const fetchUserWislistLogic = async (user, query) => {
+  const { page } = query;
   const { email } = user;
+  const limit = 3;
+  const skip = (page - 1) * limit;
   try {
     const wishlist = await Wishlist.findOne({ email: email });
     let products = [];
+    let totalProducts = wishlist.products.length;
     if (wishlist) {
       await Promise.all(
-        wishlist.products.map(async (product) => {
+        wishlist.products.splice(skip, skip + limit).map(async (product) => {
           const productDetails = await Product.findOne({
             _id: product.product,
           });
@@ -99,7 +103,7 @@ const fetchUserWislistLogic = async (user) => {
         })
       );
     }
-    return { wishlist: products };
+    return { wishlist: products, totalProducts };
   } catch (error) {
     return { error: error };
   }
