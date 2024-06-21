@@ -8,6 +8,8 @@ const {
   fetchProductReviewsLogic,
   addProductReviewLogic,
   checkIsProductInWishlistLogic,
+  fetchCategoriesLogic,
+  addProductLogic,
 } = require("../businessLogic/productLogic");
 
 const fetchProductsController = async (req, res) => {
@@ -96,6 +98,22 @@ const addProductReviewController = async (req, res) => {
   return res.status(200).json({ message: response.message });
 };
 
+const fetchCategoriesController = async (req, res) => {
+  const response = await fetchCategoriesLogic();
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res.status(200).json({ categories: response.categories });
+};
+
+const addProductController = async (req, res) => {
+  const response = await addProductLogic(req.body, req.user.payload);
+  if (response.error) {
+    return res.status(400).json({ error: response.error });
+  }
+  return res.status(200).json({ message: response.message });
+};
+
 module.exports = {
   fetchProductsController,
   addProductToWishlistController,
@@ -106,4 +124,6 @@ module.exports = {
   checkoutController,
   fetchProductReviewsController,
   addProductReviewController,
+  fetchCategoriesController,
+  addProductController,
 };

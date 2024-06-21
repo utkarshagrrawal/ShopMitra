@@ -44,11 +44,14 @@ const deleteUserController = async (req, res) => {
 };
 
 const fetchUserWislistController = async (req, res) => {
-  const response = await fetchUserWislistLogic(req.user.payload);
+  const response = await fetchUserWislistLogic(req.user.payload, req.query);
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
-  return res.status(200).json({ wishlist: response.wishlist });
+  return res.status(200).json({
+    wishlist: response.wishlist,
+    totalWishlist: response.totalProducts,
+  });
 };
 
 const fetchUserCartController = async (req, res) => {

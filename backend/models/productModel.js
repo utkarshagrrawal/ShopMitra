@@ -11,7 +11,6 @@ const product = new mongoose.Schema({
   },
   productUrl: {
     type: String,
-    required: true,
   },
   stars: {
     type: Number,

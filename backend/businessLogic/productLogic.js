@@ -3,6 +3,8 @@ const { Product } = require("../models/productModel");
 const { Wishlist } = require("../models/wishlistModel");
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
+const { Category } = require("../models/categoryModel");
+const { Seller } = require("../models/sellerModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
@@ -295,6 +297,83 @@ const addProductReviewLogic = async (user, body) => {
   }
 };
 
+const fetchCategoriesLogic = async () => {
+  try {
+    const categories = await Category.find().sort({ category_name: 1 });
+    return { categories };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const addProductLogic = async (body, user) => {
+  try {
+    const {
+      productTitle,
+      productPrice,
+      productListPrice,
+      category,
+      stock,
+      imgUrl,
+    } = body;
+    const { email } = user;
+    const product = await Product.create({
+      title: productTitle,
+      price: productPrice,
+      listPrice: productListPrice,
+      category_id: category,
+      stock: stock,
+      imgUrl: imgUrl,
+      stars: 0,
+      boughtInLastMonth: 0,
+      isBestSeller: false,
+      productUrl: "",
+      reviews: 0,
+    });
+    const seller = await Seller.findOne({ email: email });
+    if (!seller) {
+      await Seller.create({
+        email: email,
+        products: [
+          {
+            productId: product._id,
+            stock: stock,
+            totalBought: 0,
+            totalBoughtThisMonth: 0,
+            totalReviews: 0,
+            totalRating: 0,
+            totalCost: "0",
+            totalEarning: "0",
+          },
+        ],
+        earnings: "0",
+        totalProducts: 1,
+      });
+    } else {
+      await Seller.updateOne(
+        { email: email },
+        {
+          $push: {
+            products: {
+              productId: product._id,
+              stock: stock,
+              totalBought: 0,
+              totalBoughtThisMonth: 0,
+              totalReviews: 0,
+              totalRating: 0,
+              totalCost: "0",
+              totalEarning: "0",
+            },
+          },
+        }
+      );
+    }
+    return { message: "Product added successfully" };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchProductsLogic,
   addProductToWishlistLogic,
@@ -305,4 +384,6 @@ module.exports = {
   checkoutLogic,
   fetchProductReviewsLogic,
   addProductReviewLogic,
+  fetchCategoriesLogic,
+  addProductLogic,
 };
