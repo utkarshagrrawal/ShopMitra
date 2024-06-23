@@ -38,7 +38,7 @@ export function SellerDashboard() {
         );
         const data = await response.json();
         if (data.error) {
-          if (data.error === "Unauthorized") {
+          if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href =
               "/signin?redirectTo=" +
@@ -79,7 +79,7 @@ export function SellerDashboard() {
         );
         const data = await response.json();
         if (data.error) {
-          if (data.error === "Unauthorized") {
+          if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href =
               "/signin?redirectTo=" +
@@ -145,7 +145,7 @@ export function SellerDashboard() {
       const data = await response.json();
       setAddingNewProduct(false);
       if (data.error) {
-        if (data.error === "Unauthorized") {
+        if (data.error === "Please login to proceed") {
           localStorage.removeItem("token");
           window.location.href =
             "/signin?redirectTo=" +
@@ -463,7 +463,10 @@ export function SellerDashboard() {
                 {sellerProductsInfo.productDetails?.map((product, index) => (
                   <div
                     key={index}
-                    className="bg-white p-6 rounded-lg border mt-4"
+                    className="bg-white p-6 rounded-lg border mt-4 hover:cursor-pointer hover:shadow-md transition-transform transform hover:scale-105"
+                    onClick={() =>
+                      (location.href = `/seller/product/${product._id}`)
+                    }
                   >
                     <img
                       src={product.imgUrl}

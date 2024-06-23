@@ -28,4 +28,63 @@ const fetchSellerDataLogic = async (user) => {
   }
 };
 
-module.exports = { fetchSellerDataLogic };
+const updateProductDetailsLogic = async (body, user, params) => {
+  try {
+    const { email } = user;
+    const { id } = params;
+    const { title, price, listPrice, imgUrl } = body;
+    const isThisSellerProduct = await Seller.findOne({
+      email: email,
+      products: { $elemMatch: { productId: id } },
+    });
+    if (!isThisSellerProduct) {
+      return { error: "Product not found" };
+    }
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: id },
+      { title, price, listPrice, imgUrl },
+      { new: true }
+    );
+    if (!updatedProduct) {
+      return { error: "Error updating product" };
+    }
+    return { message: "Product updated successfully" };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const addStockLogic = async (body, user, params) => {
+  try {
+    const { email } = user;
+    const { id } = params;
+    const { stock } = body;
+    const isThisSellerProduct = await Seller.findOne({
+      email: email,
+      products: { $elemMatch: { productId: id } },
+    });
+    if (!isThisSellerProduct) {
+      return { error: "Product not found" };
+    }
+    const updatedProduct = await Seller.findOneAndUpdate(
+      {
+        email: email,
+        "products.productId": id,
+      },
+      { $inc: { "products.0.stock": stock } },
+      { new: true }
+    );
+    if (!updatedProduct) {
+      return { error: "Error updating product" };
+    }
+    return { message: "Stock updated successfully" };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+module.exports = {
+  fetchSellerDataLogic,
+  updateProductDetailsLogic,
+  addStockLogic,
+};

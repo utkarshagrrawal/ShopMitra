@@ -18,7 +18,7 @@ const authenticate = async (req, res, next) => {
   const token = req.headers.authorization;
   const decodedPayload = await jwtVerify(token);
   if (decodedPayload.error) {
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: "Please login to proceed" });
   } else {
     req.user = decodedPayload;
     next();

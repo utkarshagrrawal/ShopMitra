@@ -63,7 +63,7 @@ export default function Header(props) {
       );
       const data = await response.json();
       if (data.error) {
-        if (data.error === "Unauthorized") {
+        if (data.error === "Please login to proceed") {
           localStorage.removeItem("token");
           props?.redirectTo &&
             (location.href = `/signin?redirectTo=${encodeURIComponent(
@@ -95,7 +95,7 @@ export default function Header(props) {
         );
         const data = await response.json();
         if (data.error) {
-          if (data.error === "Unauthorized") {
+          if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             props?.redirectTo &&
               (location.href = `/signin?redirectTo=${encodeURIComponent(
