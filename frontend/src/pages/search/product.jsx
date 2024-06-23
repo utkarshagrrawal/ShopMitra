@@ -1,6 +1,5 @@
 import React from "react";
 import { Rating } from "../../components/rating";
-import { FavouriteIcon } from "../../components/favouriteIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 
 export function Product(props) {
