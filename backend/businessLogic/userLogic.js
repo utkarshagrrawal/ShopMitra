@@ -92,8 +92,9 @@ const fetchUserWislistLogic = async (user, query) => {
   try {
     const wishlist = await Wishlist.findOne({ email: email });
     let products = [];
-    let totalProducts = wishlist.products.length;
+    let totalProducts = 0;
     if (wishlist) {
+      totalProducts = wishlist.products?.length;
       await Promise.all(
         wishlist.products.splice(skip, skip + limit).map(async (product) => {
           const productDetails = await Product.findOne({
