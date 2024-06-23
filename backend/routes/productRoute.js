@@ -17,13 +17,14 @@ const router = express.Router();
 
 router.get("/search", fetchProductsController);
 router.get("/categories", authenticate, fetchCategoriesController);
-router.get("/:id", fetchProductDetailsController);
 router.get(
   "/is-in-wishlist/:id",
   authenticate,
   checkIsProductInWishlistController
 );
 router.get("/fetch-reviews/:id", fetchProductReviewsController);
+router.get("/:id", fetchProductDetailsController);
+
 router.post("/add-new", authenticate, addProductController);
 router.post("/checkout", authenticate, checkoutController);
 router.post("/add-review", authenticate, addProductReviewController);
@@ -33,6 +34,7 @@ router.post(
   authenticate,
   addRemoveProductToCartController
 );
+
 router.delete(
   "/remove-item-from-cart",
   authenticate,

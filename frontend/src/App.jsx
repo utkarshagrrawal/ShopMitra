@@ -19,6 +19,7 @@ import { AboutPage } from "./pages/about";
 import { LearnMorePage } from "./pages/learnMore";
 import { Order } from "./pages/order";
 import { SellerDashboard } from "./pages/dashboard/sellerDashboard";
+import { SellerProductDetails } from "./pages/dashboard/sellerProductDetails";
 
 function App() {
   const { toasts } = useToasterStore();
@@ -56,6 +57,10 @@ function App() {
         <Route path="/about" element={<AboutPage />}></Route>
         <Route path="/order-tracking/:orderId" element={<Order />}></Route>
         <Route path="/learn-more" element={<LearnMorePage />}></Route>
+        <Route
+          path="/seller/product/:id"
+          element={<SellerProductDetails />}
+        ></Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </Router>

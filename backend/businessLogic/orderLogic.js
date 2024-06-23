@@ -1,6 +1,7 @@
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
 const { Product } = require("../models/productModel");
+const { Seller } = require("../models/sellerModel");
 
 const cancelOrderDueToPaymentFailureLogic = async (query) => {
   const { orderId } = query;
@@ -29,6 +30,21 @@ const processOrderLogic = async (query) => {
     const updateOrderStatus = await Order.updateOne(
       { orderId },
       { status: "processed" }
+    );
+    const allProductsInOrder = order.products;
+    await Promise.all(
+      allProductsInOrder.map(async (product) => {
+        const productDetails = await Product.findOne({
+          _id: product.product,
+        });
+        const seller = await Seller.updateOne(
+          { products: { $elemMatch: { product: product.product } } },
+          {
+            $inc: { "products.$.stock": -product.quantity },
+            $inc: { "products.$.totalCost": productDetails.price },
+          }
+        );
+      })
     );
     if (
       updateOrderStatus.matchedCount === 0 ||

@@ -54,7 +54,7 @@ export function CustomerDashboard() {
       );
       const data = await response.json();
       if (data.error) {
-        if (data.error === "Unauthorized") {
+        if (data.error === "Please login to proceed") {
           localStorage.removeItem("token");
           ErrorAlert("You are not logged in. Please login to view this page.");
           window.location.href = "/";

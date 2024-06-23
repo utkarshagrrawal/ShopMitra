@@ -35,7 +35,7 @@ export function SearchResults() {
         const data = await response.json();
         if (data.error) {
           ErrorAlert(data.error);
-          if (data.error === "Unauthorized") {
+          if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href = "/signin";
           }

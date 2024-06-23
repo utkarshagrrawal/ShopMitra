@@ -102,6 +102,8 @@ const fetchUserWislistLogic = async (user, query) => {
           products.push(productDetails);
         })
       );
+    } else {
+      return { error: "Wishlist not found" };
     }
     return { wishlist: products, totalProducts };
   } catch (error) {
