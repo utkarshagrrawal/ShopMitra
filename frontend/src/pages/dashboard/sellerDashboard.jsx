@@ -10,7 +10,9 @@ export function SellerDashboard() {
   const [currentSection, setCurrentSection] = useState(section || "status");
   const [loading, setLoading] = useState(true);
   const [sellerBasicInfo, setSellerBasicInfo] = useState({});
-  const [sellerProductsInfo, setSellerProductsInfo] = useState({});
+  const [sellerProductsInfo, setSellerProductsInfo] = useState([]);
+  const [productsPage, setProductsPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [isNewProductSectionOpen, setIsNewProductSectionOpen] = useState(false);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [newProduct, setNewProduct] = useState({
@@ -22,12 +24,15 @@ export function SellerDashboard() {
     imgUrl: "",
   });
   const [addingNewProduct, setAddingNewProduct] = useState(false);
+  const [totalSales, setTotalSales] = useState(0);
 
   useEffect(() => {
     const fetchSellerData = async () => {
       try {
         const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "seller/dashboard",
+          import.meta.env.VITE_BACKEND_URL +
+            "seller/dashboard?page=" +
+            productsPage,
           {
             method: "GET",
             headers: {
@@ -51,10 +56,11 @@ export function SellerDashboard() {
         } else {
           setLoading(false);
           setSellerBasicInfo(data.sellerDetails);
-          setSellerProductsInfo({
-            sellerProductsInfo: data.sellerProductsInfo,
-            productDetails: data.productDetails,
-          });
+          setSellerProductsInfo([
+            ...sellerProductsInfo,
+            ...data.sellerProducts,
+          ]);
+          setTotalProducts(data.totalSellerProducts);
         }
       } catch (error) {
         ErrorAlert("An error occurred. Please try again later");
@@ -62,7 +68,7 @@ export function SellerDashboard() {
       }
     };
     fetchSellerData();
-  }, []);
+  }, [productsPage]);
 
   useEffect(() => {
     const fetchProductCategories = async () => {
@@ -203,7 +209,7 @@ export function SellerDashboard() {
               onClick={() => setCurrentSection("statistics")}
               to="/seller/dashboard/statistics"
             >
-              <div className="text-sm font-medium">Status</div>
+              <div className="text-sm font-medium">Status (Coming soon)</div>
               <ChevronRightIcon />
             </Link>
             <Link
@@ -460,7 +466,7 @@ export function SellerDashboard() {
                 Existing Products
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sellerProductsInfo.productDetails?.map((product, index) => (
+                {sellerProductsInfo?.map((product, index) => (
                   <div
                     key={index}
                     className="bg-white p-6 rounded-lg border mt-4 hover:cursor-pointer hover:shadow-md transition-transform transform hover:scale-105"
@@ -490,6 +496,18 @@ export function SellerDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+              <div
+                className={`flex mt-4 justify-center items-center ${
+                  totalProducts > productsPage * 10 || "hidden"
+                }`}
+              >
+                <button
+                  className="bg-blue-600 w-full text-white p-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => setProductsPage(productsPage + 1)}
+                >
+                  Load More
+                </button>
               </div>
             </div>
           </div>

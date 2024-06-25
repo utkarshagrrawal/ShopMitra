@@ -8,6 +8,7 @@ const {
 const router = express.Router();
 
 router.get("/dashboard", authenticate, fetchSellerDataController);
+router.get("/orders", authenticate);
 
 router.put("/product/:id/stock", authenticate, addStockController);
 router.put("/product/:id", authenticate, updateProductDetailsController);

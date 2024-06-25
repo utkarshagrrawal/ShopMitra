@@ -62,7 +62,7 @@ export function CheckoutPage() {
             Authorization: localStorage.getItem("token"),
           },
           body: JSON.stringify({
-            totalPrice: (subtotal + 1.02 + subtotal * 0.18).toFixed(2),
+            totalPrice: (subtotal + subtotal * 0.18).toFixed(2),
           }),
         }
       );
@@ -132,7 +132,7 @@ export function CheckoutPage() {
             </div>
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600">Shipping</span>
-              <span className="text-gray-800">$1.02</span>
+              <span className="text-gray-800">$0.00</span>
             </div>
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600">Tax</span>
@@ -144,7 +144,7 @@ export function CheckoutPage() {
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600 font-semibold">Total</span>
               <span className="text-gray-800 font-semibold">
-                ${subtotal && (subtotal + 1.02 + subtotal * 0.18).toFixed(2)}
+                ${subtotal && (subtotal + subtotal * 0.18).toFixed(2)}
               </span>
             </div>
           </div>

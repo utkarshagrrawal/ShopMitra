@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { PhoneIcon } from "../components/phoneIcon";
 import { InboxIcon } from "../components/inboxIcon";
 import { LocateIcon } from "../components/locateIcon";
@@ -18,24 +17,24 @@ export default function Footer() {
         <div className="space-y-4">
           <h3 className="text-lg font-bold">Quick Links</h3>
           <nav className="space-y-2 flex flex-col">
-            <Link
-              to="/"
+            <a
+              href="/"
               className="text-gray-400 hover:text-white transition-colors"
             >
               Home
-            </Link>
-            <Link
-              to="/results?q=shirts"
+            </a>
+            <a
+              href="/results?q=shirts"
               className="text-gray-400 hover:text-white transition-colors"
             >
               Shop
-            </Link>
-            <Link
-              to="/about"
+            </a>
+            <a
+              href="/about"
               className="text-gray-400 hover:text-white transition-colors"
             >
               About
-            </Link>
+            </a>
           </nav>
         </div>
         <div className="space-y-4">

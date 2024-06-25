@@ -4,11 +4,10 @@ const { Wishlist } = require("../models/wishlistModel");
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
 const { Category } = require("../models/categoryModel");
-const { Seller } = require("../models/sellerModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { v4: uuidv4 } = require("uuid");
-const mongoose = require("mongoose");
 const Review = require("../models/reviewModel");
+const { OrderedProducts } = require("../models/orderedProducts");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
@@ -16,15 +15,16 @@ const fetchProductsLogic = async (query) => {
   const skip = (page - 1) * limit;
 
   try {
+    const totalProducts = await Product.countDocuments();
     const products = await Product.find(
       { $text: { $search: q } },
       { score: { $meta: "textScore" } }
     )
-      .sort({ score: { $meta: "textScore" }, _id: 1 })
+      .sort({ score: { $meta: "textScore" }, _id: 1, stock: -1 })
       .skip(skip)
       .limit(limit);
 
-    return { products };
+    return { products, totalProducts };
   } catch (error) {
     return { error: error };
   }
@@ -196,6 +196,25 @@ const checkoutLogic = async (user, body) => {
     } else if (cart.products.length === 0) {
       return { error: "Cart is empty" };
     }
+
+    const isStockAvailable = await Promise.all(
+      cart.products.map(async (product) => {
+        const productDetails = await Product.findOne({
+          _id: product.product,
+        });
+        if (!productDetails) {
+          return false;
+        }
+        if (productDetails.stock < product.quantity) {
+          return false;
+        }
+        return true;
+      })
+    );
+    if (isStockAvailable.includes(false)) {
+      return { error: "Stock not available" };
+    }
+
     const lineItems = await Promise.all(
       cart.products.map(async (product) => {
         const productDetails = await Product.findById(product.product);
@@ -206,7 +225,10 @@ const checkoutLogic = async (user, body) => {
               name: productDetails.title,
               images: [productDetails.imgUrl],
             },
-            unit_amount_decimal: (Number(totalPrice) * 100).toFixed(2),
+            unit_amount_decimal: (
+              Number(productDetails.price) * 100 +
+              Number(productDetails.price) * 0.18 * 100
+            ).toFixed(0),
           },
           quantity: product.quantity,
         };
@@ -216,10 +238,20 @@ const checkoutLogic = async (user, body) => {
     const order = await Order.create({
       orderId,
       email: email,
-      products: cart.products,
       total: totalPrice,
       status: "pending",
     });
+    for (let i = 0; i < cart.products.length; i++) {
+      const product = cart.products[i];
+      const productDetails = await Product.findById(product.product);
+      await OrderedProducts.create({
+        orderId,
+        product: product.product,
+        quantity: product.quantity,
+        sellerId: productDetails.sellerId,
+        productTitle: productDetails.title,
+      });
+    }
     if (!order) {
       return { error: "An error occurred while creating order" };
     }
@@ -276,7 +308,7 @@ const addProductReviewLogic = async (user, body) => {
   const { productId, rating, review } = body;
   try {
     const reviewId = await createReviewId();
-    const userDetails = await User.findOne({ email }).lean();
+    const userDetails = await User.findOne({ email, is_deleted: false }).lean();
     if (!userDetails) {
       return { error: "User not found" };
     }
@@ -317,7 +349,15 @@ const addProductLogic = async (body, user) => {
       imgUrl,
     } = body;
     const { email } = user;
-    const product = await Product.create({
+    let sellerDetails = await User.findOne({
+      email: email,
+      user_type: "seller",
+      is_deleted: false,
+    });
+    if (!sellerDetails) {
+      return { error: "Seller not found" };
+    }
+    const productDetails = await Product.create({
       title: productTitle,
       price: productPrice,
       listPrice: productListPrice,
@@ -329,44 +369,11 @@ const addProductLogic = async (body, user) => {
       isBestSeller: false,
       productUrl: "",
       reviews: 0,
+      stock: stock,
+      sellerId: sellerDetails._id,
     });
-    const seller = await Seller.findOne({ email: email });
-    if (!seller) {
-      await Seller.create({
-        email: email,
-        products: [
-          {
-            productId: product._id,
-            stock: stock,
-            totalBought: 0,
-            totalBoughtThisMonth: 0,
-            totalReviews: 0,
-            totalRating: 0,
-            totalCost: "0",
-            totalEarning: "0",
-          },
-        ],
-        earnings: "0",
-        totalProducts: 1,
-      });
-    } else {
-      await Seller.updateOne(
-        { email: email },
-        {
-          $push: {
-            products: {
-              productId: product._id,
-              stock: stock,
-              totalBought: 0,
-              totalBoughtThisMonth: 0,
-              totalReviews: 0,
-              totalRating: 0,
-              totalCost: "0",
-              totalEarning: "0",
-            },
-          },
-        }
-      );
+    if (!productDetails) {
+      return { error: "An error occurred while adding product" };
     }
     return { message: "Product added successfully" };
   } catch (error) {

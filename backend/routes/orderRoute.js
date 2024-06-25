@@ -7,12 +7,13 @@ const {
 } = require("../controllers/orderController");
 const router = express.Router();
 
+router.get("/validate-order", authenticate, processOrderController);
 router.get("/:orderId", authenticate, fetchOrderDetailsController);
+
 router.delete(
   "/cancel-order",
   authenticate,
   cancelOrderDueToPaymentFailureController
 );
-router.get("/validate-order", authenticate, processOrderController);
 
 module.exports = router;

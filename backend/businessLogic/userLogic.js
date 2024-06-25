@@ -1,5 +1,6 @@
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
+const { OrderedProducts } = require("../models/orderedProducts");
 const { Product } = require("../models/productModel");
 const { User } = require("../models/userModel");
 const { Wishlist } = require("../models/wishlistModel");
@@ -11,7 +12,11 @@ const {
 const updateProfileLogic = async (body) => {
   let { name, email, phone, address, date_of_birth } = body;
 
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({
+    email: email,
+    isDeleted: false,
+    user_type: "customer",
+  });
   if (!user) {
     return { error: "User not found" };
   }
@@ -37,7 +42,7 @@ const changeUserPasswordLogic = async (body, user) => {
   const { email } = user;
 
   try {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email, isDeleted: false });
     if (!user) {
       return { error: "User not found" };
     }
@@ -147,15 +152,18 @@ const fetchUserOrdersLogic = async (user, query) => {
     const totalOrders = await Order.find({ email }).count();
     let orderDetails = await Promise.all(
       orders.map(async (order) => {
-        let products = await Promise.all(
-          order.products.map(async (product) => {
+        let products = await OrderedProducts.find({
+          orderId: order.orderId,
+        }).lean();
+        let productDetails = await Promise.all(
+          products.map(async (product) => {
             const productDetails = await Product.findOne({
               _id: product.product,
             }).lean();
-            return { ...productDetails };
+            return { ...productDetails, quantity: product.quantity };
           })
         );
-        return { order, products };
+        return { order, products: productDetails };
       })
     );
     return { orders: orderDetails, totalOrders };

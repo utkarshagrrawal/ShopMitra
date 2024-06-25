@@ -17,7 +17,12 @@ const fetchProductsController = async (req, res) => {
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
-  return res.status(200).json({ products: response.products });
+  return res
+    .status(200)
+    .json({
+      products: response.products,
+      totalProducts: response.totalProducts,
+    });
 };
 
 const addProductToWishlistController = async (req, res) => {
