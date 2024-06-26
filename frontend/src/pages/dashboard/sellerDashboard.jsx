@@ -251,7 +251,7 @@ export function SellerDashboard() {
               onClick={() => setCurrentSection("statistics")}
               to="/seller/dashboard/statistics"
             >
-              <div className="text-sm font-medium">Status (Coming soon)</div>
+              <div className="text-sm font-medium">Status</div>
               <ChevronRightIcon />
             </Link>
             <Link
@@ -558,32 +558,32 @@ export function SellerDashboard() {
               <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
             </div>
           ) : (
-            <div className="grid">
-              <h2 className="text-2xl font-bold mb-4">Your Orders</h2>
-              <div className="bg-white">
-                {orders?.length > 0 ? (
-                  <ul className="space-y-4">
-                    {orders.map((orderId) => (
-                      <li
-                        key={orderId}
-                        className="flex items-center justify-between bg-gray-100 p-4 rounded-md hover:bg-gray-200 transition"
+            <div className="flex flex-col">
+              <h2 className="text-2xl font-bold mb-4">Orders</h2>
+              {orders?.length > 0 ? (
+                <ul className="space-y-4">
+                  {orders.map((orderId) => (
+                    <li
+                      key={orderId}
+                      className="flex items-center justify-between bg-gray-100 p-4 rounded-md hover:bg-gray-200 transition"
+                    >
+                      <span className="text-lg font-medium">
+                        Order #{orderId}
+                      </span>
+                      <Link
+                        to={`/seller/order/${orderId}`}
+                        className="text-blue-500 hover:underline"
                       >
-                        <span className="text-lg font-medium">
-                          Order #{orderId}
-                        </span>
-                        <Link
-                          to={`/seller/order/${orderId}`}
-                          className="text-blue-500 hover:underline"
-                        >
-                          View Details
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No orders found.</p>
-                )}
-              </div>
+                        View Details
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="bg-gray-100 p-4 rounded-md">
+                  <span className="text-gray-500">No orders yet</span>
+                </div>
+              )}
             </div>
           ))}
       </div>

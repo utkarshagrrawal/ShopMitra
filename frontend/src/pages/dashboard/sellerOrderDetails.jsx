@@ -44,9 +44,9 @@ export function SellerOrderDetails() {
       <Header />
       <div className="container mx-auto px-4 md:px-6 py-8">
         {orderDetails?.length > 0 &&
-          orderDetails?.map((order) => (
+          orderDetails?.map((order, index) => (
             <div
-              key={order._id}
+              key={index}
               className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4"
             >
               <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-4">

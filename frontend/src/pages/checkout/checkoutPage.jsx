@@ -12,6 +12,7 @@ export function CheckoutPage() {
   const [subtotal, setSubtotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [userType, setUserType] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +40,33 @@ export function CheckoutPage() {
       setLoading(false);
     };
     fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const isUserSeller = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          ErrorAlert(data.error);
+        } else {
+          setUserType(data.user.user_type);
+        }
+      } catch (error) {
+        ErrorAlert("An error occurred while checking user type");
+        console.log(error);
+      }
+    };
+    isUserSeller();
   }, []);
 
   useEffect(() => {
@@ -148,26 +176,28 @@ export function CheckoutPage() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col">
-            <button
-              className={`border border-gray-300 rounded-lg py-2 mt-4 ${
-                processingPayment && "cursor-not-allowed opacity-50"
-              }`}
-              onClick={() => navigate("/")}
-              disabled={processingPayment}
-            >
-              Cancel order
-            </button>
-            <button
-              className={`border bg-black text-white rounded-lg py-2 mt-4 flex justify-center ${
-                processingPayment && "cursor-not-allowed opacity-50"
-              }`}
-              onClick={handlePayment}
-              disabled={processingPayment}
-            >
-              {processingPayment ? <ButtonLoader /> : "Proceed to pay"}
-            </button>
-          </div>
+          {userType !== "seller" && (
+            <div className="flex flex-col">
+              <button
+                className={`border border-gray-300 rounded-lg py-2 mt-4 ${
+                  processingPayment && "cursor-not-allowed opacity-50"
+                }`}
+                onClick={() => navigate("/")}
+                disabled={processingPayment}
+              >
+                Cancel order
+              </button>
+              <button
+                className={`border bg-black text-white rounded-lg py-2 mt-4 flex justify-center ${
+                  processingPayment && "cursor-not-allowed opacity-50"
+                }`}
+                onClick={handlePayment}
+                disabled={processingPayment}
+              >
+                {processingPayment ? <ButtonLoader /> : "Proceed to pay"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
