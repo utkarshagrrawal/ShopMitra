@@ -30,10 +30,9 @@ const fetchSellerDataLogic = async (user, query) => {
   }
 };
 
-const fetchSellerOrders = async (user, query) => {
+const fetchSellerOrdersLogic = async (user) => {
   try {
     const { email } = user;
-    const { page } = query;
     const sellerDetails = await User.findOne({
       email: email,
       is_deleted: false,
@@ -42,19 +41,10 @@ const fetchSellerOrders = async (user, query) => {
     if (!sellerDetails) {
       return { error: "Seller not found" };
     }
-    const totalSellerProducts = await OrderedProducts.find({
+    const totalSellerOrders = await OrderedProducts.distinct("orderId", {
       sellerId: sellerDetails._id,
-    })
-      .distinct(orderId)
-      .count();
-    const sellerProducts = await OrderedProducts.find({
-      sellerId: sellerDetails._id,
-    })
-      .lean()
-      .sort({ title: 1 })
-      .skip(page * 10 - 10)
-      .limit(10);
-    return { sellerDetails, sellerProducts, totalSellerProducts };
+    });
+    return { totalSellerOrders };
   } catch (error) {
     return { error: error };
   }
@@ -112,8 +102,46 @@ const addStockLogic = async (body, user, params) => {
   }
 };
 
+const fetchProductsInOrderLogic = async (user, params) => {
+  try {
+    const { email } = user;
+    const { orderId } = params;
+    const userDetails = await User.findOne({
+      email: email,
+      user_type: "seller",
+      is_deleted: false,
+    });
+    if (!userDetails) {
+      return { error: "Seller not found" };
+    }
+    const productsInOrder = await OrderedProducts.find({
+      orderId,
+      sellerId: userDetails._id,
+    });
+    if (productsInOrder.length === 0) {
+      return { error: "Order not found" };
+    }
+    const products = await Promise.all(
+      productsInOrder.map(async (product) => {
+        const productDetails = await Product.findOne({ _id: product.product });
+        return {
+          quantity: product.quantity,
+          price: productDetails.price,
+          imgUrl: productDetails.imgUrl,
+          title: productDetails.title,
+        };
+      })
+    );
+    return { productsInOrder: products };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchSellerDataLogic,
+  fetchSellerOrdersLogic,
   updateProductDetailsLogic,
   addStockLogic,
+  fetchProductsInOrderLogic,
 };

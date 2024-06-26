@@ -24,7 +24,8 @@ export function SellerDashboard() {
     imgUrl: "",
   });
   const [addingNewProduct, setAddingNewProduct] = useState(false);
-  const [totalSales, setTotalSales] = useState(0);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     const fetchSellerData = async () => {
@@ -69,6 +70,42 @@ export function SellerDashboard() {
     };
     fetchSellerData();
   }, [productsPage]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "seller/orders",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          if (data.error === "Please login to proceed") {
+            localStorage.removeItem("token");
+            window.location.href =
+              "/signin?redirectTo=" +
+              encodeURIComponent(window.location.pathname);
+            ErrorAlert("Please login to continue");
+            return;
+          }
+          ErrorAlert(data.error);
+          return;
+        }
+        setOrders(data.totalSellerOrders);
+        setOrdersLoading(false);
+      } catch (error) {
+        console.log(error);
+        ErrorAlert("An error occurred. Please try again later");
+      }
+    };
+    fetchOrders();
+  }, []);
 
   useEffect(() => {
     const fetchProductCategories = async () => {
@@ -512,6 +549,44 @@ export function SellerDashboard() {
             </div>
           </div>
         )}
+        {currentSection === "orders" &&
+          (ordersLoading ? (
+            <div className="grid grid-cols-1 gap-4 items-center justify-between bg-gray-100 p-4 rounded-md">
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+            </div>
+          ) : (
+            <div className="grid">
+              <h2 className="text-2xl font-bold mb-4">Your Orders</h2>
+              <div className="bg-white">
+                {orders?.length > 0 ? (
+                  <ul className="space-y-4">
+                    {orders.map((orderId) => (
+                      <li
+                        key={orderId}
+                        className="flex items-center justify-between bg-gray-100 p-4 rounded-md hover:bg-gray-200 transition"
+                      >
+                        <span className="text-lg font-medium">
+                          Order #{orderId}
+                        </span>
+                        <Link
+                          to={`/seller/order/${orderId}`}
+                          className="text-blue-500 hover:underline"
+                        >
+                          View Details
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No orders found.</p>
+                )}
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );
