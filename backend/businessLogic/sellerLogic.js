@@ -126,7 +126,7 @@ const fetchProductsInOrderLogic = async (user, params) => {
         const productDetails = await Product.findOne({ _id: product.product });
         return {
           quantity: product.quantity,
-          price: productDetails.price,
+          price: product.price,
           imgUrl: productDetails.imgUrl,
           title: productDetails.title,
         };

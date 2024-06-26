@@ -250,6 +250,7 @@ const checkoutLogic = async (user, body) => {
         quantity: product.quantity,
         sellerId: productDetails.sellerId,
         productTitle: productDetails.title,
+        price: productDetails.price,
       });
     }
     if (!order) {
