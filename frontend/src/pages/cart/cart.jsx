@@ -54,7 +54,7 @@ export function Cart() {
     <div className="flex flex-col min-h-[100dvh]">
       <Header redirectTo={"/cart"} />
       {cartItems && cartItems.length > 0 ? (
-        <main className="flex justify-center py-8 md:py-12 lg:py-16">
+        <main className="flex justify-center py-8 md:py-12 lg:py-16 min-h-[70vh]">
           <div className="container px-4 md:px-6">
             <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
               <div className="space-y-8">
@@ -126,7 +126,7 @@ export function Cart() {
           </div>
         </main>
       ) : (
-        <div className="flex items-center justify-center h-[60vh]">
+        <div className="flex items-center justify-center min-h-[70vh]">
           <div className="flex flex-col items-center gap-4">
             <img
               src={emptyCartLogo}

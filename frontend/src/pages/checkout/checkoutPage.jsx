@@ -119,8 +119,8 @@ export function CheckoutPage() {
   ) : (
     <>
       <Header redirectTo="/checkout" />
-      <div className="grid lg:grid-cols-2 gap-8 mx-auto py-12 px-4 md:px-6">
-        <div className="flex flex-col gap-4 space-y-6 border rounded-lg p-4 md:p-6">
+      <div className="grid lg:grid-cols-2 gap-8 mx-auto py-12 px-4 md:px-6 min-h-[70vh]">
+        <div className="flex flex-col gap-4 space-y-6 border rounded-lg p-4 md:p-6 h-fit">
           {cartItems?.length > 0 &&
             cartItems.map((item) => (
               <div
@@ -176,7 +176,7 @@ export function CheckoutPage() {
               </span>
             </div>
           </div>
-          {userType !== "seller" && (
+          {userType === "customer" ? (
             <div className="flex flex-col">
               <button
                 className={`border border-gray-300 rounded-lg py-2 mt-4 ${
@@ -196,6 +196,12 @@ export function CheckoutPage() {
               >
                 {processingPayment ? <ButtonLoader /> : "Proceed to pay"}
               </button>
+            </div>
+          ) : (
+            <div className="flex justify-center mt-4 border rounded-md p-4">
+              <span className="text-red-500 font-semibold">
+                <strong>NOTE: </strong>Sellers cannot purchase products
+              </span>
             </div>
           )}
         </div>
