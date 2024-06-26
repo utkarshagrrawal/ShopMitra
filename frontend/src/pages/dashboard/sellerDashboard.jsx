@@ -26,6 +26,7 @@ export function SellerDashboard() {
   const [addingNewProduct, setAddingNewProduct] = useState(false);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [statistics, setStatistics] = useState({});
 
   useEffect(() => {
     const fetchSellerData = async () => {
@@ -98,6 +99,10 @@ export function SellerDashboard() {
           return;
         }
         setOrders(data.totalSellerOrders);
+        setStatistics({
+          ...statistics,
+          totalOrders: data.totalSellerOrders.length,
+        });
         setOrdersLoading(false);
       } catch (error) {
         console.log(error);
@@ -292,24 +297,18 @@ export function SellerDashboard() {
           </div>
         </div>
         {currentSection === "statistics" && (
-          <div className="grid gap-4">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid gap-8">
+            <div className="grid md:grid-cols-2 gap-6">
               {[
-                { title: "Total Sales", value: "$0.00" },
-                { title: "Total Orders", value: "0" },
-                { title: "Total Products", value: "0" },
-                { title: "Total Earnings", value: "$0.00" },
+                { title: "Total Orders", value: statistics.totalOrders },
+                { title: "Total Products", value: totalProducts },
               ].map((item, index) => (
                 <div
                   key={index}
-                  className="bg-white max-h-48 p-6 rounded-lg flex flex-col justify-center items-center shadow-md transition-transform transform hover:scale-105"
+                  className="bg-gradient-to-r from-gray-100 to-gray-300 text-gray-800 p-6 rounded-lg flex flex-col justify-center items-center shadow-lg transform transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
                 >
-                  <div className="text-lg font-semibold text-gray-600">
-                    {item.title}
-                  </div>
-                  <div className="text-4xl font-extrabold text-gray-800">
-                    {item.value}
-                  </div>
+                  <div className="text-lg font-semibold mb-2">{item.title}</div>
+                  <div className="text-4xl font-extrabold">{item.value}</div>
                 </div>
               ))}
             </div>
