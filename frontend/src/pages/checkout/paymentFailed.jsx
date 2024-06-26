@@ -29,6 +29,7 @@ export function PaymentFailed() {
         if (data.error) {
           ErrorAlert(data.error);
         }
+        window.location.href = "/cart";
       } catch (error) {
         console.log(error);
         if (retryCount < retryLimit) {

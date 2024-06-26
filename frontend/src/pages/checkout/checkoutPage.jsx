@@ -12,6 +12,7 @@ export function CheckoutPage() {
   const [subtotal, setSubtotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [userType, setUserType] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +43,33 @@ export function CheckoutPage() {
   }, []);
 
   useEffect(() => {
+    const isUserSeller = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          ErrorAlert(data.error);
+        } else {
+          setUserType(data.user.user_type);
+        }
+      } catch (error) {
+        ErrorAlert("An error occurred while checking user type");
+        console.log(error);
+      }
+    };
+    isUserSeller();
+  }, []);
+
+  useEffect(() => {
     let total = 0;
     cartItems.forEach((item) => {
       total += item.price * item.quantity;
@@ -62,7 +90,7 @@ export function CheckoutPage() {
             Authorization: localStorage.getItem("token"),
           },
           body: JSON.stringify({
-            totalPrice: (subtotal + 1.02 + subtotal * 0.18).toFixed(2),
+            totalPrice: (subtotal + subtotal * 0.18).toFixed(2),
           }),
         }
       );
@@ -132,7 +160,7 @@ export function CheckoutPage() {
             </div>
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600">Shipping</span>
-              <span className="text-gray-800">$1.02</span>
+              <span className="text-gray-800">$0.00</span>
             </div>
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600">Tax</span>
@@ -144,30 +172,32 @@ export function CheckoutPage() {
             <div className="flex justify-between items-center mt-4">
               <span className="text-gray-600 font-semibold">Total</span>
               <span className="text-gray-800 font-semibold">
-                ${subtotal && (subtotal + 1.02 + subtotal * 0.18).toFixed(2)}
+                ${subtotal && (subtotal + subtotal * 0.18).toFixed(2)}
               </span>
             </div>
           </div>
-          <div className="flex flex-col">
-            <button
-              className={`border border-gray-300 rounded-lg py-2 mt-4 ${
-                processingPayment && "cursor-not-allowed opacity-50"
-              }`}
-              onClick={() => navigate("/")}
-              disabled={processingPayment}
-            >
-              Cancel order
-            </button>
-            <button
-              className={`border bg-black text-white rounded-lg py-2 mt-4 flex justify-center ${
-                processingPayment && "cursor-not-allowed opacity-50"
-              }`}
-              onClick={handlePayment}
-              disabled={processingPayment}
-            >
-              {processingPayment ? <ButtonLoader /> : "Proceed to pay"}
-            </button>
-          </div>
+          {userType !== "seller" && (
+            <div className="flex flex-col">
+              <button
+                className={`border border-gray-300 rounded-lg py-2 mt-4 ${
+                  processingPayment && "cursor-not-allowed opacity-50"
+                }`}
+                onClick={() => navigate("/")}
+                disabled={processingPayment}
+              >
+                Cancel order
+              </button>
+              <button
+                className={`border bg-black text-white rounded-lg py-2 mt-4 flex justify-center ${
+                  processingPayment && "cursor-not-allowed opacity-50"
+                }`}
+                onClick={handlePayment}
+                disabled={processingPayment}
+              >
+                {processingPayment ? <ButtonLoader /> : "Proceed to pay"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

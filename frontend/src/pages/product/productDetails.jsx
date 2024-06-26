@@ -6,6 +6,7 @@ import Loader from "../../components/loader";
 import { StarIcon } from "../../components/starIcon";
 import { Comments } from "./comments";
 import InfoIcon from "../../components/infoIcon";
+import { ChevronDownIcon } from "../../components/chevronDownIcon";
 
 const StarRating = ({ rating, onRatingChange }) => {
   const [hoverRating, setHoverRating] = useState(0);
@@ -412,14 +413,24 @@ export function ProductDetails() {
             </div>
             <div className="w-full mx-auto bg-white border border-gray-200 rounded-lg shadow-sm">
               <div
-                className={`w-full px-4 py-2 text-sm font-medium flex justify-center items-center rounded-t-lg cursor-pointer transition-colors duration-300 ${
-                  reviewSectionVisible
-                    ? "bg-gray-800 text-white"
-                    : "bg-gray-200 text-gray-800"
-                }`}
+                className="w-full px-4 py-2 text-sm font-medium flex justify-center items-center rounded-t-lg cursor-pointer bg-gray-200"
                 onClick={() => setReviewSectionVisible(!reviewSectionVisible)}
               >
-                {reviewSectionVisible ? "Close" : "Write a Review"}
+                {reviewSectionVisible ? (
+                  <span className="text-gray-800 flex items-center gap-2">
+                    Hide Review Section
+                    <span className="transform duration-300 transition-transform -rotate-180">
+                      <ChevronDownIcon />
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-gray-800 flex items-center gap-2">
+                    Write a Review
+                    <span className="transform duration-300 transition-transform">
+                      <ChevronDownIcon />
+                    </span>
+                  </span>
+                )}
               </div>
               <form
                 onSubmit={handleSubmit}

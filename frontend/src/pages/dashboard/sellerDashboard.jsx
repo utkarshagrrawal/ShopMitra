@@ -10,7 +10,9 @@ export function SellerDashboard() {
   const [currentSection, setCurrentSection] = useState(section || "status");
   const [loading, setLoading] = useState(true);
   const [sellerBasicInfo, setSellerBasicInfo] = useState({});
-  const [sellerProductsInfo, setSellerProductsInfo] = useState({});
+  const [sellerProductsInfo, setSellerProductsInfo] = useState([]);
+  const [productsPage, setProductsPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [isNewProductSectionOpen, setIsNewProductSectionOpen] = useState(false);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [newProduct, setNewProduct] = useState({
@@ -22,12 +24,17 @@ export function SellerDashboard() {
     imgUrl: "",
   });
   const [addingNewProduct, setAddingNewProduct] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [statistics, setStatistics] = useState({});
 
   useEffect(() => {
     const fetchSellerData = async () => {
       try {
         const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "seller/dashboard",
+          import.meta.env.VITE_BACKEND_URL +
+            "seller/dashboard?page=" +
+            productsPage,
           {
             method: "GET",
             headers: {
@@ -51,10 +58,11 @@ export function SellerDashboard() {
         } else {
           setLoading(false);
           setSellerBasicInfo(data.sellerDetails);
-          setSellerProductsInfo({
-            sellerProductsInfo: data.sellerProductsInfo,
-            productDetails: data.productDetails,
-          });
+          setSellerProductsInfo([
+            ...sellerProductsInfo,
+            ...data.sellerProducts,
+          ]);
+          setTotalProducts(data.totalSellerProducts);
         }
       } catch (error) {
         ErrorAlert("An error occurred. Please try again later");
@@ -62,6 +70,46 @@ export function SellerDashboard() {
       }
     };
     fetchSellerData();
+  }, [productsPage]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "seller/orders",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          if (data.error === "Please login to proceed") {
+            localStorage.removeItem("token");
+            window.location.href =
+              "/signin?redirectTo=" +
+              encodeURIComponent(window.location.pathname);
+            ErrorAlert("Please login to continue");
+            return;
+          }
+          ErrorAlert(data.error);
+          return;
+        }
+        setOrders(data.totalSellerOrders);
+        setStatistics({
+          ...statistics,
+          totalOrders: data.totalSellerOrders.length,
+        });
+        setOrdersLoading(false);
+      } catch (error) {
+        console.log(error);
+        ErrorAlert("An error occurred. Please try again later");
+      }
+    };
+    fetchOrders();
   }, []);
 
   useEffect(() => {
@@ -249,24 +297,18 @@ export function SellerDashboard() {
           </div>
         </div>
         {currentSection === "statistics" && (
-          <div className="grid gap-4">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid gap-8">
+            <div className="grid md:grid-cols-2 gap-6">
               {[
-                { title: "Total Sales", value: "$0.00" },
-                { title: "Total Orders", value: "0" },
-                { title: "Total Products", value: "0" },
-                { title: "Total Earnings", value: "$0.00" },
+                { title: "Total Orders", value: statistics.totalOrders },
+                { title: "Total Products", value: totalProducts },
               ].map((item, index) => (
                 <div
                   key={index}
-                  className="bg-white max-h-48 p-6 rounded-lg flex flex-col justify-center items-center shadow-md transition-transform transform hover:scale-105"
+                  className="bg-gradient-to-r from-gray-100 to-gray-300 text-gray-800 p-6 rounded-lg flex flex-col justify-center items-center shadow-lg transform transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
                 >
-                  <div className="text-lg font-semibold text-gray-600">
-                    {item.title}
-                  </div>
-                  <div className="text-4xl font-extrabold text-gray-800">
-                    {item.value}
-                  </div>
+                  <div className="text-lg font-semibold mb-2">{item.title}</div>
+                  <div className="text-4xl font-extrabold">{item.value}</div>
                 </div>
               ))}
             </div>
@@ -460,7 +502,7 @@ export function SellerDashboard() {
                 Existing Products
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sellerProductsInfo.productDetails?.map((product, index) => (
+                {sellerProductsInfo?.map((product, index) => (
                   <div
                     key={index}
                     className="bg-white p-6 rounded-lg border mt-4 hover:cursor-pointer hover:shadow-md transition-transform transform hover:scale-105"
@@ -491,9 +533,59 @@ export function SellerDashboard() {
                   </div>
                 ))}
               </div>
+              <div
+                className={`flex mt-4 justify-center items-center ${
+                  totalProducts > productsPage * 10 || "hidden"
+                }`}
+              >
+                <button
+                  className="bg-blue-600 w-full text-white p-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => setProductsPage(productsPage + 1)}
+                >
+                  Load More
+                </button>
+              </div>
             </div>
           </div>
         )}
+        {currentSection === "orders" &&
+          (ordersLoading ? (
+            <div className="grid grid-cols-1 gap-4 items-center justify-between bg-gray-100 p-4 rounded-md">
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+              <span className="h-9 bg-gray-300 w-full animate-pulse rounded-md"></span>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              <h2 className="text-2xl font-bold mb-4">Orders</h2>
+              {orders?.length > 0 ? (
+                <ul className="space-y-4">
+                  {orders.map((orderId) => (
+                    <li
+                      key={orderId}
+                      className="flex items-center justify-between bg-gray-100 p-4 rounded-md hover:bg-gray-200 transition"
+                    >
+                      <span className="text-lg font-medium">
+                        Order #{orderId}
+                      </span>
+                      <Link
+                        to={`/seller/order/${orderId}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        View Details
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="bg-gray-100 p-4 rounded-md">
+                  <span className="text-gray-500">No orders yet</span>
+                </div>
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );

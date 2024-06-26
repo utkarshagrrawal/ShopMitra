@@ -94,6 +94,10 @@ export function CustomerDashboard() {
       );
       const data = await response.json();
       if (data.error) {
+        if (data.error === "Wishlist not found") {
+          setWishlistLoading(false);
+          return;
+        }
         ErrorAlert(data.error);
       } else {
         setWishlistLoading(false);
@@ -431,29 +435,20 @@ export function CustomerDashboard() {
                         )}
                       </div>
                       <div className="grid gap-4 border-t border-gray-200 pt-4">
-                        {order.order.products.map((product, i) => (
-                          <div
-                            className="flex items-center justify-between"
-                            key={i}
-                          >
-                            <div className="text-sm font-medium text-gray-700 text-clip">
-                              {
-                                order.products.find(
-                                  (item) => item._id === product.product
-                                ).title
-                              }
-                              ...
+                        {order.products?.length > 0 &&
+                          order.products?.map((product, i) => (
+                            <div
+                              className="flex items-center justify-between"
+                              key={i}
+                            >
+                              <div className="text-sm font-medium text-gray-700 text-clip">
+                                {product.title}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                x {product.quantity}
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-600">
-                              x{" "}
-                              {
-                                order.order.products.find(
-                                  (item) => item.product === product.product
-                                ).quantity
-                              }
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                       <div className="mt-4 text-right text-sm font-semibold text-gray-800">
                         Total: ${order.order.total}
@@ -505,7 +500,7 @@ export function CustomerDashboard() {
                     No items in wishlist
                   </div>
                 ) : (
-                  wishlist.map((product, i) => (
+                  wishlist?.map((product, i) => (
                     <div
                       key={i}
                       className="relative group overflow-hidden border rounded-lg shadow-lg hover:shadow-xl duration-300"

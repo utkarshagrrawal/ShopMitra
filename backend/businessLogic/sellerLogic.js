@@ -1,28 +1,50 @@
+const { OrderedProducts } = require("../models/orderedProducts");
 const { Product } = require("../models/productModel");
-const { Seller } = require("../models/sellerModel");
 const { User } = require("../models/userModel");
 
-const fetchSellerDataLogic = async (user) => {
+const fetchSellerDataLogic = async (user, query) => {
   try {
-    let productDetails, sellerProductsInfo;
     const { email } = user;
-    const sellerDetails = await User.findOne({ email: email });
+    const { page } = query;
+    const sellerDetails = await User.findOne({
+      email: email,
+      is_deleted: false,
+      user_type: "seller",
+    });
     if (!sellerDetails) {
       return { error: "Seller not found" };
     }
-    sellerProductsInfo = await Seller.find({ email: email }).lean();
-    if (!sellerProductsInfo || sellerProductsInfo.length === 0) {
-      return { sellerDetails, sellerProductsInfo: {}, productDetails: [] };
+    const totalSellerProducts = await Product.find({
+      sellerId: sellerDetails._id,
+    }).count();
+    const sellerProducts = await Product.find({
+      sellerId: sellerDetails._id,
+    })
+      .lean()
+      .sort({ title: 1 })
+      .skip(page * 10 - 10)
+      .limit(10);
+    return { sellerDetails, sellerProducts, totalSellerProducts };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+const fetchSellerOrdersLogic = async (user) => {
+  try {
+    const { email } = user;
+    const sellerDetails = await User.findOne({
+      email: email,
+      is_deleted: false,
+      user_type: "seller",
+    });
+    if (!sellerDetails) {
+      return { error: "Seller not found" };
     }
-    productDetails = await Promise.all(
-      sellerProductsInfo[0].products.map(async (item) => {
-        const productInfo = await Product.findOne({
-          _id: item.productId,
-        }).lean();
-        return productInfo;
-      })
-    );
-    return { sellerDetails, productDetails, sellerProductsInfo };
+    const totalSellerOrders = await OrderedProducts.distinct("orderId", {
+      sellerId: sellerDetails._id,
+    });
+    return { totalSellerOrders };
   } catch (error) {
     return { error: error };
   }
@@ -33,20 +55,20 @@ const updateProductDetailsLogic = async (body, user, params) => {
     const { email } = user;
     const { id } = params;
     const { title, price, listPrice, imgUrl } = body;
-    const isThisSellerProduct = await Seller.findOne({
+    const userDetails = await User.findOne({
       email: email,
-      products: { $elemMatch: { productId: id } },
+      user_type: "seller",
+      is_deleted: false,
     });
-    if (!isThisSellerProduct) {
-      return { error: "Product not found" };
+    if (!userDetails) {
+      return { error: "Seller not found" };
     }
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: id },
-      { title, price, listPrice, imgUrl },
-      { new: true }
+    const updateIfThisIsSellerProduct = await Product.updateOne(
+      { _id: id, sellerId: userDetails._id },
+      { title, price, listPrice, imgUrl }
     );
-    if (!updatedProduct) {
-      return { error: "Error updating product" };
+    if (updateIfThisIsSellerProduct.matchedCount === 0) {
+      return { error: "Product not found" };
     }
     return { message: "Product updated successfully" };
   } catch (error) {
@@ -59,23 +81,20 @@ const addStockLogic = async (body, user, params) => {
     const { email } = user;
     const { id } = params;
     const { stock } = body;
-    const isThisSellerProduct = await Seller.findOne({
+    const userDetails = await User.findOne({
       email: email,
-      products: { $elemMatch: { productId: id } },
+      user_type: "seller",
+      is_deleted: false,
     });
-    if (!isThisSellerProduct) {
-      return { error: "Product not found" };
+    if (!userDetails) {
+      return { error: "Seller not found" };
     }
-    const updatedProduct = await Seller.findOneAndUpdate(
-      {
-        email: email,
-        "products.productId": id,
-      },
-      { $inc: { "products.0.stock": stock } },
-      { new: true }
+    const updateIfThisIsSellerProduct = await Product.updateOne(
+      { _id: id, sellerId: userDetails._id },
+      { $inc: { stock: stock } }
     );
-    if (!updatedProduct) {
-      return { error: "Error updating product" };
+    if (updateIfThisIsSellerProduct.matchedCount === 0) {
+      return { error: "Product not found" };
     }
     return { message: "Stock updated successfully" };
   } catch (error) {
@@ -83,8 +102,46 @@ const addStockLogic = async (body, user, params) => {
   }
 };
 
+const fetchProductsInOrderLogic = async (user, params) => {
+  try {
+    const { email } = user;
+    const { orderId } = params;
+    const userDetails = await User.findOne({
+      email: email,
+      user_type: "seller",
+      is_deleted: false,
+    });
+    if (!userDetails) {
+      return { error: "Seller not found" };
+    }
+    const productsInOrder = await OrderedProducts.find({
+      orderId,
+      sellerId: userDetails._id,
+    });
+    if (productsInOrder.length === 0) {
+      return { error: "Order not found" };
+    }
+    const products = await Promise.all(
+      productsInOrder.map(async (product) => {
+        const productDetails = await Product.findOne({ _id: product.product });
+        return {
+          quantity: product.quantity,
+          price: product.price,
+          imgUrl: productDetails.imgUrl,
+          title: productDetails.title,
+        };
+      })
+    );
+    return { productsInOrder: products };
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 module.exports = {
   fetchSellerDataLogic,
+  fetchSellerOrdersLogic,
   updateProductDetailsLogic,
   addStockLogic,
+  fetchProductsInOrderLogic,
 };

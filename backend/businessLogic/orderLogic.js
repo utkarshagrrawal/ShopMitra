@@ -1,7 +1,7 @@
 const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
+const { OrderedProducts } = require("../models/orderedProducts");
 const { Product } = require("../models/productModel");
-const { Seller } = require("../models/sellerModel");
 
 const cancelOrderDueToPaymentFailureLogic = async (query) => {
   const { orderId } = query;
@@ -34,14 +34,13 @@ const processOrderLogic = async (query) => {
     const allProductsInOrder = order.products;
     await Promise.all(
       allProductsInOrder.map(async (product) => {
-        const productDetails = await Product.findOne({
-          _id: product.product,
-        });
-        const seller = await Seller.updateOne(
-          { products: { $elemMatch: { product: product.product } } },
+        await Product.updateOne(
+          { _id: product.product },
           {
-            $inc: { "products.$.stock": -product.quantity },
-            $inc: { "products.$.totalCost": productDetails.price },
+            $inc: { stock: -product.quantity },
+            $inc: { totalBought: product.quantity },
+            $inc: { totalCost: product.quantity * product.price },
+            $inc: { totalEarnings: product.quantity * product.price },
           }
         );
       })
@@ -62,9 +61,13 @@ const processOrderLogic = async (query) => {
 const fetchOrderDetailsLogic = async (params) => {
   const { orderId } = params;
   try {
-    const order = await Order.findOne({ orderId }).lean();
+    const order = await Order.findOne({ orderId });
+    if (!order) {
+      return { error: "Order not found" };
+    }
+    const orderedProducts = await OrderedProducts.find({ orderId });
     const orderDetails = await Promise.all(
-      order.products.map(async (product) => {
+      orderedProducts.map(async (product) => {
         const productDetails = await Product.findOne({
           _id: product.product,
         });
@@ -75,9 +78,6 @@ const fetchOrderDetailsLogic = async (params) => {
         };
       })
     );
-    if (!order) {
-      return { error: "Order not found" };
-    }
     return { order: order, orderDetails: orderDetails };
   } catch (error) {
     return { error: error };

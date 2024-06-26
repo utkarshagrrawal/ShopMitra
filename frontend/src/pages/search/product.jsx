@@ -1,6 +1,5 @@
 import React from "react";
 import { Rating } from "../../components/rating";
-import { FavouriteIcon } from "../../components/favouriteIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 
 export function Product(props) {
@@ -32,8 +31,13 @@ export function Product(props) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-2 p-4">
-      <div className="grid grid-cols-[200px_1fr] gap-4">
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-2 p-4 relative">
+      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-4">
+        <div className="absolute top-2 right-2 bg-white p-2 rounded-full border">
+          <span className="text-gray-500 text-sm">
+            #{props.product.stock > 0 ? "In Stock" : "Out of Stock"}
+          </span>
+        </div>
         <div className="flex justify-center items-center">
           <img
             src={props.product.imgUrl}
@@ -44,7 +48,7 @@ export function Product(props) {
         <div className="p-4 flex flex-col justify-between">
           <div>
             <h2
-              className="text-xl font-bold mb-2 text-gray-800 hover:underline hover:cursor-pointer"
+              className="text-md lg:text-xl font-bold mb-2 text-gray-800 hover:underline hover:cursor-pointer"
               onClick={() => (location.href = "/product/" + props.product?._id)}
             >
               {props.product.title}
@@ -74,7 +78,7 @@ export function Product(props) {
           </div>
           <div className="flex items-center justify-between mt-4">
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 w-full lg:w-fit text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
               onClick={() => handleAddToCart(props.product?._id)}
             >
               Add to Cart

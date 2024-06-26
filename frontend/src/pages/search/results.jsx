@@ -11,6 +11,7 @@ export function SearchResults() {
   const [searching, setSearching] = useState(true);
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export function SearchResults() {
         setLoading(false);
         if (page === 1) setSearching(false);
         setResults([...results, ...data.products]);
+        setTotalProducts(data.totalProducts);
       } catch (error) {
         ErrorAlert("An error occurred while fetching search results");
         console.log(error);
@@ -66,7 +68,7 @@ export function SearchResults() {
   return !searching ? (
     <>
       <Header searchQuery={searchQuery.get("q")} />
-      <div className="grid lg:grid-cols-[300px_1fr] gap-4 p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 p-4">
         <div className="p-6 h-max bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">
             Search Results for:{" "}
@@ -116,7 +118,7 @@ export function SearchResults() {
             onClick={() => setPage(page + 1)}
             className={`px-4 py-2 border w-full flex justify-center items-center gap-2 border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-200 transition-all duration-300 ${
               loading ? "bg-gray-300 cursor-not-allowed" : "bg-white"
-            }`}
+            } ${totalProducts > page * 10 || "hidden"}`}
             disabled={loading}
           >
             {loading ? (

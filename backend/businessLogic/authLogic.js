@@ -69,7 +69,7 @@ const userDetailsLogic = async (user) => {
 
 const generateOtpCodeLogic = async (body) => {
   const { email } = body;
-  const user = await User.find({ email });
+  const user = await User.find({ email, is_deleted: false });
   if (user.length === 0) {
     return { error: "User not found" };
   }
