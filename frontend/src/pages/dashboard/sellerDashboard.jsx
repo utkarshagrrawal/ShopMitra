@@ -219,7 +219,7 @@ export function SellerDashboard() {
     <div className="container mx-auto py-8 px-4">
       <div className="grid md:grid-cols-[200px_1fr] gap-8">
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full flex flex-col justify-center border border-4 border-green-500 relative">
+          <div className="w-24 h-24 rounded-full flex flex-col justify-center border-4 border-green-500 relative">
             <img
               src="https://freerangestock.com/sample/119157/business-man-profile-vector.jpg"
               className="rounded-full w-24 h-24 object-contain mix-blend-multiply"
