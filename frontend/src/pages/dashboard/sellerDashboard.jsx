@@ -4,6 +4,7 @@ import { ChevronRightIcon } from "../../components/chevronRightIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import Loader from "../../components/loader";
 import { ChevronDownIcon } from "../../components/chevronDownIcon";
+import { Select } from "../../components/select";
 
 export function SellerDashboard() {
   const { section } = useParams();
@@ -399,35 +400,12 @@ export function SellerDashboard() {
                     >
                       Category
                     </label>
-                    <select
-                      className="p-2 border border-gray-300 focus:outline-none focus:border-blue-500 rounded-lg"
-                      id="category"
-                      name="category"
-                      value={newProduct.category || ""}
-                      onChange={handleNewProductDetails}
-                      required
-                    >
-                      {!isNewProductSectionOpen ? (
-                        <option>Loading...</option>
-                      ) : (
-                        availableCategories?.length > 0 &&
-                        availableCategories?.map((category, index) => {
-                          if (index === 0) {
-                            return (
-                              <option key={index} value="" defaultValue="">
-                                Select a category
-                              </option>
-                            );
-                          } else {
-                            return (
-                              <option key={index} value={category.id}>
-                                {category.category_name}
-                              </option>
-                            );
-                          }
-                        })
-                      )}
-                    </select>
+                    <Select
+                      options={availableCategories}
+                      selected={newProduct.category}
+                      setSelected={setNewProduct}
+                      placeholder="Select a category"
+                    />
                   </div>
                   <div className="flex flex-col">
                     <label
