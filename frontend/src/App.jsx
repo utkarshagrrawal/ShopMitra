@@ -21,6 +21,8 @@ import { Order } from "./pages/order";
 import { SellerDashboard } from "./pages/dashboard/sellerDashboard";
 import { SellerProductDetails } from "./pages/dashboard/sellerProductDetails";
 import { SellerOrderDetails } from "./pages/dashboard/sellerOrderDetails";
+import ErrorBoundary from "./components/errorBoundary";
+import { FallbackPage } from "./pages/fallback/fallbackPage";
 
 function App() {
   const { toasts } = useToasterStore();
@@ -33,42 +35,44 @@ function App() {
   }, [toasts]);
 
   return (
-    <Router>
-      <Toaster />
-      <Routes>
-        <Route path="/" element={<Landing />}></Route>
-        <Route path="/signin" element={<Signin />}></Route>
-        <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
-        <Route path="/resetpassword" element={<ResetPassword />}></Route>
-        <Route
-          path="/dashboard/:section"
-          element={<CustomerDashboard />}
-        ></Route>
-        <Route
-          path="/seller/dashboard/:section"
-          element={<SellerDashboard />}
-        ></Route>
-        <Route path="/results" element={<SearchResults />}></Route>
-        <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/checkout" element={<CheckoutPage />}></Route>
-        <Route path="/payment-success" element={<PaymentSuccess />}></Route>
-        <Route path="/payment-failed" element={<PaymentFailed />}></Route>
-        <Route path="/product/:id" element={<ProductDetails />}></Route>
-        <Route path="/about" element={<AboutPage />}></Route>
-        <Route path="/order-tracking/:orderId" element={<Order />}></Route>
-        <Route path="/learn-more" element={<LearnMorePage />}></Route>
-        <Route
-          path="/seller/product/:id"
-          element={<SellerProductDetails />}
-        ></Route>
-        <Route
-          path="/seller/order/:orderId"
-          element={<SellerOrderDetails />}
-        ></Route>
-        <Route path="*" element={<NotFound />}></Route>
-      </Routes>
-    </Router>
+    <ErrorBoundary fallback={<FallbackPage />}>
+      <Router>
+        <Toaster />
+        <Routes>
+          <Route path="/" element={<Landing />}></Route>
+          <Route path="/signin" element={<Signin />}></Route>
+          <Route path="/signup" element={<Signup />}></Route>
+          <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
+          <Route path="/resetpassword" element={<ResetPassword />}></Route>
+          <Route
+            path="/dashboard/:section"
+            element={<CustomerDashboard />}
+          ></Route>
+          <Route
+            path="/seller/dashboard/:section"
+            element={<SellerDashboard />}
+          ></Route>
+          <Route path="/results" element={<SearchResults />}></Route>
+          <Route path="/cart" element={<Cart />}></Route>
+          <Route path="/checkout" element={<CheckoutPage />}></Route>
+          <Route path="/payment-success" element={<PaymentSuccess />}></Route>
+          <Route path="/payment-failed" element={<PaymentFailed />}></Route>
+          <Route path="/product/:id" element={<ProductDetails />}></Route>
+          <Route path="/about" element={<AboutPage />}></Route>
+          <Route path="/order-tracking/:orderId" element={<Order />}></Route>
+          <Route path="/learn-more" element={<LearnMorePage />}></Route>
+          <Route
+            path="/seller/product/:id"
+            element={<SellerProductDetails />}
+          ></Route>
+          <Route
+            path="/seller/order/:orderId"
+            element={<SellerOrderDetails />}
+          ></Route>
+          <Route path="*" element={<NotFound />}></Route>
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
