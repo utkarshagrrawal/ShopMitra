@@ -8,15 +8,16 @@ export default function SearchBar(props) {
   );
   const [searchResults, setSearchResults] = useState([]);
   const timeoutId = useRef(null);
+  const searchResultsRef = useRef(null);
 
   const handleSearchInputChange = (e) => {
-    if (e.target.value.length > 2) {
+    if (e.target.value.length >= 2) {
       setIsSearchResultVisible(true);
     } else {
       setIsSearchResultVisible(false);
+      setSearchResults(null);
     }
     setSearchInputValue(e.target.value);
-    setSearchResults(null);
   };
 
   useEffect(() => {
@@ -46,24 +47,32 @@ export default function SearchBar(props) {
         ErrorAlert("An error occurred while fetching search results");
       }
     };
-    if (searchInputValue && searchInputValue.length > 2) {
+    if (searchInputValue && searchInputValue.length >= 2) {
       clearTimeout(timeoutId.current);
       timeoutId.current = setTimeout(fetchResults, 1000);
     }
     return () => abortController.abort();
   }, [searchInputValue]);
 
-  // removed from onblur of input because it was causing the search results to disappear when clicked
-  const handleSearchResultsVisibility = () => {
-    setIsSearchResultVisible(false);
-  };
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        searchResultsRef.current &&
+        !searchResultsRef.current.contains(e.target)
+      ) {
+        setIsSearchResultVisible(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
     <div className="flex w-full flex-col relative">
       <div className="flex w-full items-center relative">
         <input
           type="text"
-          placeholder="Enter three or more characters to search"
+          placeholder="Enter two or more characters to search"
           onChange={handleSearchInputChange}
           onFocus={handleSearchInputChange}
           value={searchInputValue}
@@ -71,18 +80,14 @@ export default function SearchBar(props) {
           className={`w-full lg:min-w-[42rem] h-10 text-black border border-black px-2 pr-[48px] focus:outline-none duration-300 ${
             isSearchResultVisible || "rounded-lg"
           }`}
+          ref={(input) => (searchResultsRef.current = input)}
         />
         <div
           className={`flex items-center justify-center bg-[#febd68] border border-t-black border-b-black border-r-black absolute right-0 h-full w-[45px] duration-300 text-md font-semibold hover:cursor-pointer ${
             isSearchResultVisible || "rounded-r-lg"
           }`}
           onClick={() => {
-            if (searchInputValue && searchInputValue.length > 2) {
-              setIsSearchResultVisible(true);
-              if (searchResults && searchResults.length > 0) {
-                location.href = "/results?q=" + searchInputValue;
-              }
-            }
+            location.href = "/results?q=" + searchInputValue;
           }}
         >
           <svg
