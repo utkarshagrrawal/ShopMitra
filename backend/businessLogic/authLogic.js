@@ -61,7 +61,17 @@ const userDetailsLogic = async (user) => {
   let users;
   try {
     users = await User.find({ email: user.email, is_deleted: false });
-    return { user: users[0] };
+    return {
+      user: {
+        name: users[0].name,
+        email: users[0].email,
+        phone: users[0].phone,
+        address: users[0].address,
+        date_of_birth: users[0].date_of_birth,
+        notification_preference: users[0].notification_preferences,
+        user_type: users[0].user_type,
+      },
+    };
   } catch (error) {
     return { error: error.message };
   }
