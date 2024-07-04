@@ -15,14 +15,15 @@ const fetchProductsLogic = async (query) => {
   const skip = (page - 1) * limit;
 
   try {
-    const totalProducts = await Product.countDocuments();
-    const products = await Product.find(
-      { $text: { $search: q } },
-      { score: { $meta: "textScore" } }
-    )
-      .sort({ score: { $meta: "textScore" }, _id: 1, stock: -1 })
-      .skip(skip)
-      .limit(limit);
+    const [products, totalProducts] = await Promise.all([
+      Product.find({ $text: { $search: q } }, { score: { $meta: "textScore" } })
+        .sort({ score: { $meta: "textScore" }, _id: 1, stock: -1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments({
+        $text: { $search: q },
+      }),
+    ]);
 
     return { products, totalProducts };
   } catch (error) {
