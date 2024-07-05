@@ -239,11 +239,11 @@ export function SellerProductDetails() {
             </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded-md w-full col-span-2 self-end"
+              className="bg-blue-500 text-white p-2 rounded-md w-full col-span-2 self-end flex justify-center"
             >
               {updatingProductDetails ? (
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -292,11 +292,11 @@ export function SellerProductDetails() {
             </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded-md w-full col-span-2 self-end"
+              className="bg-blue-500 text-white p-2 rounded-md w-full col-span-2 self-end flex justify-center"
             >
               {updatingStock ? (
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
