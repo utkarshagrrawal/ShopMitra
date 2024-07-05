@@ -14,7 +14,7 @@ const updateProfileLogic = async (body) => {
 
   const user = await User.findOne({
     email: email,
-    isDeleted: false,
+    is_deleted: false,
     user_type: "customer",
   });
   if (!user) {
@@ -42,7 +42,7 @@ const changeUserPasswordLogic = async (body, user) => {
   const { email } = user;
 
   try {
-    const user = await User.findOne({ email: email, isDeleted: false });
+    const user = await User.findOne({ email: email, is_deleted: false });
     if (!user) {
       return { error: "User not found" };
     }
@@ -82,7 +82,7 @@ const notificationPreferencesUpdateLogic = async (body, user) => {
 
 const deleteUserLogic = async (user) => {
   try {
-    await User.updateOne({ email: user.email }, { isDeleted: true });
+    await User.updateOne({ email: user.email }, { is_deleted: true });
     return { message: "User deleted successfully" };
   } catch (error) {
     return { error: error };
