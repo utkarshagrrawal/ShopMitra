@@ -17,10 +17,10 @@ export function FallbackPage() {
           </a>{" "}
           or at{" "}
           <a
-            href="mailto:utkarrshdev@gmail.com"
+            href="mailto:utkarshagrawal09jan@gmail.com"
             className="text-blue-600 underline"
           >
-            utkarrshdev@gmail.com
+            utkarshagrawal09jan@gmail.com
           </a>{" "}
           if the issue persists.
         </p>
