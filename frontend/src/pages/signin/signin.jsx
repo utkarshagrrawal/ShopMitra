@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ErrorAlert, SuccessAlert } from "../../global/alerts";
+import { ErrorAlert } from "../../global/alerts";
+import { ShowIcon } from "../../components/showIcon";
 import Logo from "../../components/logo";
+import { HideIcon } from "../../components/hideIcon";
 
 export function Signin() {
   const [loginDetails, setLoginDetails] = useState({
@@ -10,8 +12,17 @@ export function Signin() {
     rememberMe: false,
   });
   const [signingIn, setSigningIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
+
+  const handleShowPassword = () => {
+    if (showPassword) {
+      setShowPassword(false);
+    } else {
+      setShowPassword(true);
+    }
+  };
 
   const handleLoginDetailsChange = (e) => {
     const { name, value, type } = e.target;
@@ -107,7 +118,7 @@ export function Signin() {
             <div>
               <input
                 autoComplete="email"
-                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 id="email"
                 name="email"
                 placeholder="Email address"
@@ -117,18 +128,29 @@ export function Signin() {
                 onChange={handleLoginDetailsChange}
               />
             </div>
-            <div>
+            <div className="flex relative">
               <input
                 autoComplete="current-password"
-                className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 pl-3 pr-12 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 id="password"
                 name="password"
                 placeholder="Password"
                 required
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={loginDetails.password || ""}
                 onChange={handleLoginDetailsChange}
               />
+              {showPassword ? (
+                <HideIcon
+                  className="h-5 w-5 text-gray-400 absolute bottom-1/4 right-[1em] hover:cursor-pointer"
+                  onClick={handleShowPassword}
+                />
+              ) : (
+                <ShowIcon
+                  className="h-5 w-5 text-gray-400 absolute bottom-1/4 right-[1em] hover:cursor-pointer"
+                  onClick={handleShowPassword}
+                />
+              )}
             </div>
           </div>
           <div className="flex items-center justify-between">
