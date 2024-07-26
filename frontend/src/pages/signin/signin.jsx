@@ -44,7 +44,7 @@ export function Signin() {
       ErrorAlert(data.error);
     } else {
       localStorage.setItem("token", data.token);
-      if (decodeURIComponent(params.get("redirectTo"))) {
+      if (params.get("redirectTo")) {
         navigate(decodeURIComponent(params.get("redirectTo")));
       } else {
         navigate("/");
