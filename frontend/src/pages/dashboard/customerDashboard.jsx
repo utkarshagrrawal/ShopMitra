@@ -102,7 +102,7 @@ export function CustomerDashboard() {
       } else {
         setWishlistLoading(false);
         setWishlist([...wishlist, ...data.wishlist]);
-        setTotalWishlist(data.totalWishlist);
+        setTotalWishlist(data.totalWishlist || 0);
       }
     };
     fetchWishlist();
@@ -122,12 +122,12 @@ export function CustomerDashboard() {
         );
         const data = await response.json();
         if (data.error) {
-          ErrorAlert(data.error);
+          ErrorAlert("An error occurred while fetching orders");
         } else {
           setOrdersLoading(false);
           if (orderPage === 1) {
-            setTotalOrders(data.totalOrders);
-            setOrders(data.orders);
+            setTotalOrders(data.totalOrders || 0);
+            setOrders(data.orders || []);
           } else {
             setOrders([...orders, ...data.orders]);
           }
@@ -404,12 +404,13 @@ export function CustomerDashboard() {
                     <div className="h-6 bg-gray-300 rounded-md mb-2"></div>
                     <div className="h-4 bg-gray-300 rounded-md"></div>
                   </div>
-                ) : orders.length === 0 ? (
+                ) : orders?.length === 0 ? (
                   <div className="text-gray-500 border py-4 rounded-lg text-center">
                     No orders found
                   </div>
                 ) : (
-                  orders.map((order, i) => (
+                  orders?.length > 0 &&
+                  orders?.map((order, i) => (
                     <div
                       key={i}
                       className="p-4 border border-gray-200 rounded-lg mb-1"
@@ -495,7 +496,7 @@ export function CustomerDashboard() {
                       </div>
                     </div>
                   ))
-                ) : wishlist.length === 0 ? (
+                ) : wishlist?.length === 0 ? (
                   <div className="text-gray-500 text-center border rounded-lg p-4">
                     No items in wishlist
                   </div>
