@@ -123,6 +123,9 @@ export function CustomerDashboard() {
         const data = await response.json();
         if (data.error) {
           ErrorAlert("An error occurred while fetching orders");
+          setOrdersLoading(false);
+          setTotalOrders(0);
+          setOrders([]);
         } else {
           setOrdersLoading(false);
           if (orderPage === 1) {
