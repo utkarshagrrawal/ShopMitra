@@ -149,7 +149,7 @@ const fetchUserOrdersLogic = async (user, query) => {
       .skip(skip)
       .limit(limit)
       .lean();
-    const totalOrders = await Order.find({ email }).count();
+    const totalOrders = await Order.find({ email }).countDocuments();
     let orderDetails = await Promise.all(
       orders.map(async (order) => {
         let products = await OrderedProducts.find({

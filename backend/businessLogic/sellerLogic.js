@@ -16,7 +16,7 @@ const fetchSellerDataLogic = async (user, query) => {
     }
     const totalSellerProducts = await Product.find({
       sellerId: sellerDetails._id,
-    }).count();
+    }).countDocuments();
     const sellerProducts = await Product.find({
       sellerId: sellerDetails._id,
     })
