@@ -46,11 +46,11 @@ const changeUserPasswordLogic = async (body, user) => {
     if (!user) {
       return { error: "User not found" };
     }
-    const existingHashedPassword = await generateHashedPassword(
-      user.password,
+    const currentPasswordHashed = await generateHashedPassword(
+      currentPassword,
       user.hash_code
     );
-    if (currentPassword !== existingHashedPassword) {
+    if (currentPasswordHashed !== user.password) {
       return { error: "Invalid password" };
     }
     const salt = await generateSalt();
