@@ -56,20 +56,26 @@ const registerLogic = async (body) => {
       email,
       "Welcome to Shopmitra",
       "You have successfully registered on Shopmitra",
-      `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-          <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-              <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
-                  <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
-              </div>
-              <div style="margin: 20px 0; line-height: 1.6;">
-                  <h2 style="color: #333;">Welcome ${name}</h2>
-                  <p style="color: #555;">You have successfully registered on Shopmitra. Start shopping now!</p>
-              </div>
-              <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
-                  <p>&copy; 2024 Shopmitra. All rights reserved.</p>
-              </div>
-          </div>
-      </body>`
+      `<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+            <h1 style="color: #333; text-align: center;">Welcome to Shopmitra!</h1>
+            <p style="font-size: 16px; color: #555;">Dear ${name},</p>
+            <p style="font-size: 16px; color: #555;">
+                Thank you for registering on our website. We're thrilled to have you as part of the Shopmitra family!
+            </p>
+            <p style="font-size: 16px; color: #555;">
+                You can now explore our wide range of products and enjoy exclusive member benefits. Start shopping today and make the most of your experience with us!
+            </p>
+            <p style="font-size: 16px; color: #555;">
+                If you have any questions or need assistance, feel free to contact our support team at <a href="mailto:utkarsh09jan@gmail.com" style="color: #3498db;">utkarsh09jan@gmail.com</a>.
+            </p>
+            <p style="font-size: 16px; color: #555;">Happy shopping!</p>
+            <p style="font-size: 16px; color: #555; text-align: center;">Best Regards,<br>The Shopmitra Team</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="https://www.shopmitra.vercel.app" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Visit Shopmitra</a>
+            </div>
+        </div>
+    </body>`
     );
     return { message: "User registered successfully" };
   } catch (error) {
