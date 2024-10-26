@@ -26,7 +26,7 @@ export function CustomerDashboard() {
     newPassword: "",
     confirmPassword: "",
   });
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordStrength, setPasswordStrength] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [wishlistPage, setWishlistPage] = useState(1);
@@ -218,32 +218,15 @@ export function CustomerDashboard() {
     }
   };
 
-  const getStrengthColor = (strength) => {
-    switch (strength) {
-      case 1:
-        return "bg-red-500";
-      case 2:
-        return "bg-orange-500";
-      case 3:
-        return "bg-yellow-500";
-      case 4:
-        return "bg-green-500";
-      case 5:
-        return "bg-green-700";
-      default:
-        return "bg-gray-200";
-    }
-  };
-
   const handlePasswordStrength = (e) => {
     const password = e.target.value;
-    let score = 0;
-    if (password.length > 12) score++;
-    if (password.match(/[a-z]/)) score++;
-    if (password.match(/[A-Z]/)) score++;
-    if (password.match(/\d+/)) score++;
-    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score++;
-    if (password.length === 0) score = 0;
+    let score = "";
+    if (password.length > 12) score += "L,";
+    if (password.match(/[a-z]/)) score += "LC,";
+    if (password.match(/[A-Z]/)) score += "UC,";
+    if (password.match(/\d+/)) score += "N,";
+    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "SC,";
+    if (password.length === 0) score = "";
     setPasswordStrength(score);
   };
 
@@ -265,7 +248,7 @@ export function CustomerDashboard() {
       ErrorAlert("Passwords do not match");
       return;
     }
-    if (passwordStrength < 3) {
+    if (passwordStrength.split(",").length !== 6) {
       ErrorAlert("Password is too weak");
       return;
     }
@@ -291,6 +274,12 @@ export function CustomerDashboard() {
       ErrorAlert(data.error);
     } else {
       SuccessAlert(data.message);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setPasswordStrength("");
     }
   };
 
@@ -774,6 +763,7 @@ export function CustomerDashboard() {
                   name="currentPassword"
                   placeholder="Current Password"
                   onChange={handlePasswordDetails}
+                  value={passwordData.currentPassword}
                 />
                 <div className="flex flex-col">
                   <input
@@ -782,43 +772,34 @@ export function CustomerDashboard() {
                     name="newPassword"
                     placeholder="New Password"
                     onChange={handlePasswordDetails}
+                    value={passwordData.newPassword}
                   />
                   <div
-                    className={`flex w-full h-4 my-2 transition-colors duration-200 ${
-                      passwordStrength === 0 ? "hidden" : "block"
+                    className={`flex flex-col w-full p-4 mt-4 rounded-lg duration-200 bg-gray-200 ${
+                      passwordStrength === "" ? "hidden" : "block"
                     }`}
                   >
-                    {[...Array(5)].map((_, i) => {
-                      return (
-                        <div
-                          key={i}
-                          className={`${
-                            i === 0
-                              ? "border rounded-l-lg w-full"
-                              : i === 4
-                              ? "border rounded-r-lg w-full"
-                              : "border w-full"
-                          } transition-colors duration-300 ${
-                            passwordStrength > i &&
-                            getStrengthColor(passwordStrength)
-                          }`}
-                        ></div>
-                      );
-                    })}
+                    <p>
+                      {passwordStrength.includes("L,") ? "✅  " : "✘  "}
+                      Password length must be greater than 12
+                    </p>
+                    <p>
+                      {passwordStrength.includes("LC,") ? "✅  " : "✘  "}
+                      Password must contain a lowercase letter
+                    </p>
+                    <p>
+                      {passwordStrength.includes("UC,") ? "✅  " : "✘  "}
+                      Password must contain an uppercase letter
+                    </p>
+                    <p>
+                      {passwordStrength.includes("N,") ? "✅  " : "✘  "}
+                      Password must contain a number
+                    </p>
+                    <p>
+                      {passwordStrength.includes("SC,") ? "✅  " : "✘  "}
+                      Password must contain a special character like @, #
+                    </p>
                   </div>
-                  <span className="self-end">
-                    {passwordStrength === 1
-                      ? "Very weak"
-                      : passwordStrength === 2
-                      ? "Weak"
-                      : passwordStrength === 3
-                      ? "Medium"
-                      : passwordStrength === 4
-                      ? "Strong"
-                      : passwordStrength === 5
-                      ? "Very strong"
-                      : ""}
-                  </span>
                 </div>
                 <input
                   className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"
@@ -826,6 +807,7 @@ export function CustomerDashboard() {
                   name="confirmPassword"
                   placeholder="Confirm New Password"
                   onChange={handlePasswordDetails}
+                  value={passwordData.confirmPassword}
                 />
                 <button
                   className={`bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 transition-colors duration-200 ease-in-out flex justify-center ${

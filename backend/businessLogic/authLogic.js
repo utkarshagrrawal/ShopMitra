@@ -1,5 +1,6 @@
 const otpModel = require("../models/otpModel");
 const { User } = require("../models/userModel");
+const { sendEmail } = require("../services/emailService");
 const generateOtp = require("../services/otpService");
 const {
   generateSalt,
@@ -105,16 +106,11 @@ const generateOtpCodeLogic = async (body) => {
         expiry: new Date(Date.now()),
       },
     ]);
+    sendEmail(email, otp);
   } catch (err) {
     return { error: err.message };
   }
-  return {
-    otp: otp,
-    email_service_id: process.env.EMAIL_SERVICE_ID,
-    email_template_id: process.env.EMAIL_TEMPLATE_ID,
-    email_public_key: process.env.EMAIL_PUBLIC_KEY,
-    email_private_key: process.env.EMAIL_PRIVATE_KEY,
-  };
+  return { success: true };
 };
 
 const verifyOtpLogic = async (body) => {
