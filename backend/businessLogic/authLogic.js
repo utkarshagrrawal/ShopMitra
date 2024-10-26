@@ -52,6 +52,25 @@ const registerLogic = async (body) => {
   });
   try {
     await newUser.save();
+    sendEmail(
+      email,
+      "Welcome to Shopmitra",
+      "You have successfully registered on Shopmitra",
+      `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+          <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+              <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                  <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
+              </div>
+              <div style="margin: 20px 0; line-height: 1.6;">
+                  <h2 style="color: #333;">Welcome ${name}</h2>
+                  <p style="color: #555;">You have successfully registered on Shopmitra. Start shopping now!</p>
+              </div>
+              <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
+                  <p>&copy; 2024 Shopmitra. All rights reserved.</p>
+              </div>
+          </div>
+      </body>`
+    );
     return { message: "User registered successfully" };
   } catch (error) {
     return { error: error.message };
@@ -106,7 +125,30 @@ const generateOtpCodeLogic = async (body) => {
         expiry: new Date(Date.now()),
       },
     ]);
-    sendEmail(email, otp);
+    sendEmail(
+      email,
+      "Password Reset Request for shopmitra",
+      `Your otp for resetting password is ${otp}`,
+      `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+          <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+              <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                  <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
+              </div>
+              <div style="margin: 20px 0; line-height: 1.6;">
+                  <h2 style="color: #333;">Password Reset Request</h2>
+                  <p style="color: #555;">Hi there,</p>
+                  <p style="color: #555;">We received a request to reset your password. Use the OTP below to complete your request:</p>
+                  <div style="font-size: 28px; font-weight: bold; color: #28a745; background: #e9f5e9; padding: 10px; border-radius: 5px; display: inline-block; margin: 20px 0;">
+                      ${otp}
+                  </div>
+                  <p style="color: #555;">If you did not request this, please ignore this email. Your account is safe.</p>
+              </div>
+              <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
+                  <p>&copy; 2024 Shopmitra. All rights reserved.</p>
+              </div>
+          </div>
+      </body>`
+    );
   } catch (err) {
     return { error: err.message };
   }

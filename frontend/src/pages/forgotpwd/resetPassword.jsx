@@ -64,6 +64,7 @@ export function ResetPassword() {
         return ErrorAlert(data.message);
       } else {
         SuccessAlert("Password changed successfully. Please login.");
+        setPasswordStrength("");
         navigate("/signin");
       }
     } catch (error) {
