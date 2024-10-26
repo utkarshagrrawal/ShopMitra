@@ -248,7 +248,7 @@ export function CustomerDashboard() {
       ErrorAlert("Passwords do not match");
       return;
     }
-    if (passwordStrength.split(",").length !== 5) {
+    if (passwordStrength.split(",").length !== 6) {
       ErrorAlert("Password is too weak");
       return;
     }

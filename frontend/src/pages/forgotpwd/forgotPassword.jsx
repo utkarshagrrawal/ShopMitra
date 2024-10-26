@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ErrorAlert } from "../../global/alerts";
-import emailjs from "@emailjs/browser";
 import Logo from "../../components/logo";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -88,29 +87,11 @@ export function ForgotPassword() {
     const data = await response.json();
 
     if (data.error) {
-      setLoading(false);
-      ErrorAlert(data.error);
+      ErrorAlert("Error sending OTP");
     } else {
-      try {
-        await emailjs.send(
-          data.email_service_id,
-          data.email_template_id,
-          {
-            to_email: email,
-            otp: data.otp,
-          },
-          {
-            publicKey: data.email_public_key,
-            privateKey: data.email_private_key,
-          }
-        );
-        setEmailSent(true);
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
-        ErrorAlert(err.message);
-      }
+      setEmailSent(true);
     }
+    setLoading(false);
   };
 
   const handleVerifyOtp = async (e) => {

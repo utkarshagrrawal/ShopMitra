@@ -6,6 +6,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export function ResetPassword() {
   const { state } = useLocation();
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,17 +17,29 @@ export function ResetPassword() {
     }
   }, []);
 
+  const handlePasswordStrength = (e) => {
+    const password = e.target.value;
+    let score = "";
+    if (password.length > 12) score += "L,";
+    if (password.match(/[a-z]/)) score += "LC,";
+    if (password.match(/[A-Z]/)) score += "UC,";
+    if (password.match(/\d+/)) score += "N,";
+    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "SC,";
+    if (password.length === 0) score = "";
+    setPasswordStrength(score);
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    const password = e.target.password.value;
-    const confirmPassword = e.target.confirmPassword.value;
 
     if (password !== confirmPassword) {
-      setLoading(false);
       return ErrorAlert("Passwords do not match");
     }
+    if (passwordStrength.split(",").length !== 6) {
+      return ErrorAlert("Password does not meet the requirements");
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -85,13 +100,42 @@ export function ResetPassword() {
               <input
                 className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 type="password"
-                id="password"
-                name="password"
                 autoComplete="new-password"
                 placeholder="Enter your new password"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  handlePasswordStrength(e);
+                }}
                 required={true}
+                value={password}
               />
             </div>
+          </div>
+          <div
+            className={`flex flex-col w-full p-2 mt-4 rounded-lg duration-200 bg-gray-200 ${
+              passwordStrength === "" ? "hidden" : "block"
+            }`}
+          >
+            <p>
+              {passwordStrength.includes("L,") ? "✅  " : "✘  "}
+              Password length must be greater than 12
+            </p>
+            <p>
+              {passwordStrength.includes("LC,") ? "✅  " : "✘  "}
+              Password must contain a lowercase letter
+            </p>
+            <p>
+              {passwordStrength.includes("UC,") ? "✅  " : "✘  "}
+              Password must contain an uppercase letter
+            </p>
+            <p>
+              {passwordStrength.includes("N,") ? "✅  " : "✘  "}
+              Password must contain a number
+            </p>
+            <p>
+              {passwordStrength.includes("SC,") ? "✅  " : "✘  "}
+              Password must contain a special character like @, #
+            </p>
           </div>
           <div>
             <label className="block text-gray-700" htmlFor="confirmPassword">
@@ -101,10 +145,12 @@ export function ResetPassword() {
               <input
                 className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 type="password"
-                id="confirmPassword"
-                name="confirmPassword"
                 autoComplete="new-password"
                 placeholder="Confirm your new password"
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
+                value={confirmPassword}
                 required={true}
               />
             </div>
