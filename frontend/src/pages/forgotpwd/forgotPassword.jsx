@@ -8,6 +8,8 @@ export function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [otpDigits, setOtpDigits] = useState(Array(6).fill(""));
   const [emailSent, setEmailSent] = useState(false);
+  const [timer, setTimer] = useState(90);
+  const timerRef = useRef();
   const otpElementRef = useRef([]);
   const navigate = useNavigate();
 
@@ -74,6 +76,8 @@ export function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
 
+    setTimer(90);
+
     const response = await fetch(
       import.meta.env.VITE_BACKEND_URL + "auth/forgot-password",
       {
@@ -90,6 +94,17 @@ export function ForgotPassword() {
       ErrorAlert("Error sending OTP");
     } else {
       setEmailSent(true);
+      timerRef.current && clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setTimer((prev) => {
+          if (prev === 1) {
+            clearInterval(timerRef.current);
+            return 0;
+          } else {
+            return prev - 1;
+          }
+        });
+      }, 1000);
     }
     setLoading(false);
   };
@@ -192,6 +207,15 @@ export function ForgotPassword() {
                   />
                 ))}
               </div>
+              <button
+                className={`mt-1 flex justify-end w-full underline text-blue-600 hover:text-blue-700 ${
+                  timer !== 0 && "opacity-50 cursor-not-allowed"
+                }`}
+                onClick={handleSendOtp}
+                disabled={timer !== 0}
+              >
+                Resend OTP {timer !== 0 && `in ${timer}s`}
+              </button>
             </div>
           )}
           <div>
@@ -236,7 +260,7 @@ export function ForgotPassword() {
             Remember your password?{" "}
             <Link
               to="/signin"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-medium text-blue-500 hover:text-blue-600"
             >
               Login
             </Link>
