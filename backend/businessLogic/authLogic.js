@@ -109,52 +109,71 @@ const generateOtpCodeLogic = async (body) => {
   if (user.length === 0) {
     return { error: "User not found" };
   }
-  let previousOtp;
   try {
-    previousOtp = await otpModel.find({ email });
-  } catch (err) {
-    return { error: err.message };
-  }
-  if (previousOtp.length > 0) {
-    try {
-      await otpModel.deleteOne({ email });
-    } catch (err) {
-      return { error: err.message };
-    }
-  }
-  const otp = generateOtp();
-  try {
-    await otpModel.insertMany([
-      {
-        email: email,
-        otp: otp,
-        expiry: new Date(Date.now()),
-      },
-    ]);
-    sendEmail(
+    await otpModel.deleteMany({
       email,
-      "Password Reset Request for shopmitra",
-      `Your otp for resetting password is ${otp}`,
-      `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-          <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-              <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
-                  <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
-              </div>
-              <div style="margin: 20px 0; line-height: 1.6;">
-                  <h2 style="color: #333;">Password Reset Request</h2>
-                  <p style="color: #555;">Hi there,</p>
-                  <p style="color: #555;">We received a request to reset your password. Use the OTP below to complete your request:</p>
-                  <div style="font-size: 28px; font-weight: bold; color: #28a745; background: #e9f5e9; padding: 10px; border-radius: 5px; display: inline-block; margin: 20px 0;">
-                      ${otp}
-                  </div>
-                  <p style="color: #555;">If you did not request this, please ignore this email. Your account is safe.</p>
-              </div>
-              <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
-                  <p>&copy; 2024 Shopmitra. All rights reserved.</p>
-              </div>
-          </div>
-      </body>`
-    );
+      expiry: { $lt: new Date(Date.now() - 15 * 60 * 1000) },
+    });
+    let previousOtp = await otpModel.findOne({ email });
+    if (previousOtp) {
+      sendEmail(
+        email,
+        "Password Reset Request for shopmitra",
+        `Your otp for resetting password is ${previousOtp.otp}`,
+        `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+            <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                    <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
+                </div>
+                <div style="margin: 20px 0; line-height: 1.6;">
+                    <h2 style="color: #333;">Password Reset Request</h2>
+                    <p style="color: #555;">Hi there,</p>
+                    <p style="color: #555;">We received a request to reset your password. Use the OTP below to complete your request:</p>
+                    <div style="font-size: 28px; font-weight: bold; color: #28a745; background: #e9f5e9; padding: 10px; border-radius: 5px; display: inline-block; margin: 20px 0;">
+                        ${previousOtp.otp}
+                    </div>
+                    <p style="color: #555;">If you did not request this, please ignore this email. Your account is safe.</p>
+                </div>
+                <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
+                    <p>&copy; 2024 Shopmitra. All rights reserved.</p>
+                </div>
+            </div>
+        </body>`
+      );
+    } else {
+      const otp = generateOtp();
+      await otpModel.insertMany([
+        {
+          email: email,
+          otp: otp,
+          expiry: new Date(),
+        },
+      ]);
+      sendEmail(
+        email,
+        "Password Reset Request for shopmitra",
+        `Your otp for resetting password is ${otp}`,
+        `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+            <div style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                <div style="text-align: center; padding: 20px; background-color: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                    <h1 style="margin: 0; font-size: 24px;">Welcome to Shopmitra</h1>
+                </div>
+                <div style="margin: 20px 0; line-height: 1.6;">
+                    <h2 style="color: #333;">Password Reset Request</h2>
+                    <p style="color: #555;">Hi there,</p>
+                    <p style="color: #555;">We received a request to reset your password. Use the OTP below to complete your request:</p>
+                    <div style="font-size: 28px; font-weight: bold; color: #28a745; background: #e9f5e9; padding: 10px; border-radius: 5px; display: inline-block; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p style="color: #555;">If you did not request this, please ignore this email. Your account is safe.</p>
+                </div>
+                <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #777;">
+                    <p>&copy; 2024 Shopmitra. All rights reserved.</p>
+                </div>
+            </div>
+        </body>`
+      );
+    }
   } catch (err) {
     return { error: err.message };
   }
@@ -163,25 +182,18 @@ const generateOtpCodeLogic = async (body) => {
 
 const verifyOtpLogic = async (body) => {
   const { email, otp } = body;
-  const user = await otpModel.find({ email });
-  if (user.length === 0) {
-    return { error: "OTP not found" };
-  }
   try {
-    const currentTime = Date.now();
-    const otpTime = Date.parse(user[0].expiry);
-    const diff = currentTime - otpTime;
-    if (diff > 86400) {
-      await otpModel.deleteMany({ email });
-      return { error: "OTP expired" };
+    await otpModel.deleteMany({
+      email,
+      expiry: { $lt: new Date(Date.now() - 15 * 60 * 1000) },
+    });
+    const otps = await otpModel.findOne({ email });
+    if (otps && otps.length === 0) {
+      return { error: "OTP has been expired" };
     }
-  } catch (err) {
-    return { error: err.message };
-  }
-  if (user[0].otp !== otp) {
-    return { error: "Invalid OTP" };
-  }
-  try {
+    if (otps.otp !== otp) {
+      return { error: "Invalid OTP" };
+    }
     await otpModel.deleteMany({ email });
   } catch (err) {
     return { error: err.message };
