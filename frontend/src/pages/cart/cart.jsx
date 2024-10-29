@@ -74,7 +74,7 @@ export function Cart() {
                         productId={item._id}
                         productName={item.title}
                         productImage={item.imgUrl}
-                        productPrice={item.price}
+                        productPrice={item.price?.toFixed(2) || 0}
                         productQuantity={item.quantity}
                         setLoading={setLoading}
                         setCartItems={setCartItems}

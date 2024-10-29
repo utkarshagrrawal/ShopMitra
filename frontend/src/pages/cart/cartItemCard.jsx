@@ -140,12 +140,12 @@ export function CartItemCard(props) {
         </div>
         <div className="flex items-center justify-between">
           <p className="text-gray-500">
-            ${props?.productPrice || 0} x {props?.productQuantity}
+            ${props?.productPrice} x {props?.productQuantity}
           </p>
           <p className="font-medium">
             $
             {props?.productPrice
-              ? props?.productPrice * props?.productQuantity
+              ? (props?.productPrice * props?.productQuantity).toFixed(2)
               : 0}
           </p>
         </div>

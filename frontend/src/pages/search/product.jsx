@@ -33,7 +33,7 @@ export function Product(props) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-2 p-4 relative">
       <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-4">
-        <div className="absolute top-2 right-2 bg-white p-2 rounded-full border">
+        <div className="absolute top-1 right-1 bg-white p-1">
           <span className="text-gray-500 text-sm">
             #{props.product.stock > 0 ? "In Stock" : "Out of Stock"}
           </span>

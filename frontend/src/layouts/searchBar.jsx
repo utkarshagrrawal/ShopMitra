@@ -87,7 +87,9 @@ export default function SearchBar(props) {
             isSearchResultVisible || "rounded-r-lg"
           }`}
           onClick={() => {
-            location.href = "/results?q=" + searchInputValue;
+            if (searchInputValue.length >= 2) {
+              location.href = "/results?q=" + searchInputValue;
+            }
           }}
         >
           <svg
