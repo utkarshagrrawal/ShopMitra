@@ -5,6 +5,8 @@ import { ChevronDownIcon } from "../../components/chevronDownIcon";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import ToggleSwitch from "../../components/toggleButton";
 import DeleteConfirmationModal from "../../layouts/deleteModal";
+import WarningIcon from "../../components/warningIcon";
+import CheckIcon from "../../components/checkIcon";
 
 export function CustomerDashboard() {
   const { section } = useParams();
@@ -218,21 +220,19 @@ export function CustomerDashboard() {
     }
   };
 
-  const handlePasswordStrength = (e) => {
-    const password = e.target.value;
-    let score = "";
-    if (password.length > 12) score += "L,";
-    if (password.match(/[a-z]/)) score += "LC,";
-    if (password.match(/[A-Z]/)) score += "UC,";
-    if (password.match(/\d+/)) score += "N,";
-    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "SC,";
-    if (password.length === 0) score = "";
-    setPasswordStrength(score);
-  };
-
   const handlePasswordDetails = (e) => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
-    if (e.target.name === "newPassword") handlePasswordStrength(e);
+    if (e.target.name === "newPassword") {
+      const password = e.target.value;
+      let score = "";
+      if (password.length > 12) score += "M";
+      if (password.match(/[a-z]/)) score += "L";
+      if (password.match(/[A-Z]/)) score += "U";
+      if (password.match(/\d+/)) score += "N";
+      if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "S";
+      if (password.length === 0) score = "";
+      setPasswordStrength(score);
+    }
   };
 
   const handleSavePassword = async () => {
@@ -248,8 +248,8 @@ export function CustomerDashboard() {
       ErrorAlert("Passwords do not match");
       return;
     }
-    if (passwordStrength.split(",").length !== 6) {
-      ErrorAlert("Password is too weak");
+    if (passwordStrength.length !== 5) {
+      ErrorAlert("Password does not meet the requirements");
       return;
     }
 
@@ -774,32 +774,58 @@ export function CustomerDashboard() {
                     onChange={handlePasswordDetails}
                     value={passwordData.newPassword}
                   />
-                  <div
-                    className={`flex flex-col w-full p-4 mt-4 rounded-lg duration-200 bg-gray-200 ${
-                      passwordStrength === "" ? "hidden" : "block"
+                  <ul
+                    className={`text-sm text-gray-500 space-y-2 list-outside mt-4 ${
+                      passwordStrength === "" && "hidden"
                     }`}
                   >
-                    <p>
-                      {passwordStrength.includes("L,") ? "✅  " : "✘  "}
-                      Password length must be greater than 12
-                    </p>
-                    <p>
-                      {passwordStrength.includes("LC,") ? "✅  " : "✘  "}
-                      Password must contain a lowercase letter
-                    </p>
-                    <p>
-                      {passwordStrength.includes("UC,") ? "✅  " : "✘  "}
-                      Password must contain an uppercase letter
-                    </p>
-                    <p>
-                      {passwordStrength.includes("N,") ? "✅  " : "✘  "}
-                      Password must contain a number
-                    </p>
-                    <p>
-                      {passwordStrength.includes("SC,") ? "✅  " : "✘  "}
-                      Password must contain a special character like @, #
-                    </p>
-                  </div>
+                    <li className="flex items-center">
+                      {passwordStrength.includes("L") ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningIcon className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="ml-2">
+                        At least one lowercase letter
+                      </span>
+                    </li>
+                    <li className="flex items-center">
+                      {passwordStrength.includes("U") ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningIcon className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="ml-2">
+                        At least one uppercase letter
+                      </span>
+                    </li>
+                    <li className="flex items-center">
+                      {passwordStrength.includes("N") ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningIcon className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="ml-2">At least one number</span>
+                    </li>
+                    <li className="flex items-center">
+                      {passwordStrength.includes("S") ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningIcon className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="ml-2">
+                        At least one special character
+                      </span>
+                    </li>
+                    <li className="flex items-center">
+                      {passwordStrength.includes("M") ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningIcon className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="ml-2">At least 12 characters</span>
+                    </li>
+                  </ul>
                 </div>
                 <input
                   className="w-full border rounded-lg p-2 placeholder-gray-400 focus:outline-none focus:ring focus:border-blue-500 transition-all"

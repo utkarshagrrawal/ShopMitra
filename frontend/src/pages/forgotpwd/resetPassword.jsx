@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 import Logo from "../../components/logo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import CheckIcon from "../../components/checkIcon";
+import WarningIcon from "../../components/warningIcon";
 
 export function ResetPassword() {
   const { state } = useLocation();
@@ -20,11 +22,11 @@ export function ResetPassword() {
   const handlePasswordStrength = (e) => {
     const password = e.target.value;
     let score = "";
-    if (password.length > 12) score += "L,";
-    if (password.match(/[a-z]/)) score += "LC,";
-    if (password.match(/[A-Z]/)) score += "UC,";
-    if (password.match(/\d+/)) score += "N,";
-    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "SC,";
+    if (password.length > 12) score += "M";
+    if (password.match(/[a-z]/)) score += "L";
+    if (password.match(/[A-Z]/)) score += "U";
+    if (password.match(/\d+/)) score += "N";
+    if (password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) score += "S";
     if (password.length === 0) score = "";
     setPasswordStrength(score);
   };
@@ -35,7 +37,7 @@ export function ResetPassword() {
     if (password !== confirmPassword) {
       return ErrorAlert("Passwords do not match");
     }
-    if (passwordStrength.split(",").length !== 6) {
+    if (passwordStrength.length !== 5) {
       return ErrorAlert("Password does not meet the requirements");
     }
 
@@ -112,32 +114,52 @@ export function ResetPassword() {
               />
             </div>
           </div>
-          <div
-            className={`flex flex-col w-full p-2 mt-4 rounded-lg duration-200 bg-gray-200 ${
-              passwordStrength === "" ? "hidden" : "block"
+          <ul
+            className={`text-sm text-gray-500 space-y-2 list-outside ${
+              passwordStrength === "" && "hidden"
             }`}
           >
-            <p>
-              {passwordStrength.includes("L,") ? "✅  " : "✘  "}
-              Password length must be greater than 12
-            </p>
-            <p>
-              {passwordStrength.includes("LC,") ? "✅  " : "✘  "}
-              Password must contain a lowercase letter
-            </p>
-            <p>
-              {passwordStrength.includes("UC,") ? "✅  " : "✘  "}
-              Password must contain an uppercase letter
-            </p>
-            <p>
-              {passwordStrength.includes("N,") ? "✅  " : "✘  "}
-              Password must contain a number
-            </p>
-            <p>
-              {passwordStrength.includes("SC,") ? "✅  " : "✘  "}
-              Password must contain a special character like @, #
-            </p>
-          </div>
+            <li className="flex items-center">
+              {passwordStrength.includes("L") ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <WarningIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span className="ml-2">At least one lowercase letter</span>
+            </li>
+            <li className="flex items-center">
+              {passwordStrength.includes("U") ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <WarningIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span className="ml-2">At least one uppercase letter</span>
+            </li>
+            <li className="flex items-center">
+              {passwordStrength.includes("N") ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <WarningIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span className="ml-2">At least one number</span>
+            </li>
+            <li className="flex items-center">
+              {passwordStrength.includes("S") ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <WarningIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span className="ml-2">At least one special character</span>
+            </li>
+            <li className="flex items-center">
+              {passwordStrength.includes("M") ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <WarningIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span className="ml-2">At least 12 characters</span>
+            </li>
+          </ul>
           <div>
             <label className="block text-gray-700" htmlFor="confirmPassword">
               Confirm password
