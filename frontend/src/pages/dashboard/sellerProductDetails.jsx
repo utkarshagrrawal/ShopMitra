@@ -25,7 +25,7 @@ export function SellerProductDetails() {
         if (data.error) {
           if (data.error === "Please login to proceed") {
             window.location.href =
-              "/login?redirectTo" +
+              "/login?next" +
               window.encodeURIComponent(window.location.pathname);
           }
         } else {

@@ -49,8 +49,7 @@ export function SellerDashboard() {
           if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href =
-              "/signin?redirectTo=" +
-              encodeURIComponent(window.location.pathname);
+              "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
             return;
           }
@@ -91,8 +90,7 @@ export function SellerDashboard() {
           if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href =
-              "/signin?redirectTo=" +
-              encodeURIComponent(window.location.pathname);
+              "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
             return;
           }
@@ -131,8 +129,7 @@ export function SellerDashboard() {
           if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
             window.location.href =
-              "/signin?redirectTo=" +
-              encodeURIComponent(window.location.pathname);
+              "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
             return;
           }
@@ -197,8 +194,7 @@ export function SellerDashboard() {
         if (data.error === "Please login to proceed") {
           localStorage.removeItem("token");
           window.location.href =
-            "/signin?redirectTo=" +
-            encodeURIComponent(window.location.pathname);
+            "/signin?next=" + encodeURIComponent(window.location.pathname);
           ErrorAlert("Please login to continue");
           return;
         }

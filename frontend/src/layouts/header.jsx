@@ -65,10 +65,8 @@ export default function Header(props) {
       if (data.error) {
         if (data.error === "Please login to proceed") {
           localStorage.removeItem("token");
-          props?.redirectTo &&
-            (location.href = `/signin?redirectTo=${encodeURIComponent(
-              props?.redirectTo
-            )}`);
+          props?.next &&
+            (location.href = `/signin?next=${encodeURIComponent(props?.next)}`);
           return;
         }
         setIsUserSignedIn(false);
@@ -97,9 +95,9 @@ export default function Header(props) {
         if (data.error) {
           if (data.error === "Please login to proceed") {
             localStorage.removeItem("token");
-            props?.redirectTo &&
-              (location.href = `/signin?redirectTo=${encodeURIComponent(
-                props?.redirectTo
+            props?.next &&
+              (location.href = `/signin?next=${encodeURIComponent(
+                props?.next
               )}`);
           }
           return;
@@ -190,8 +188,7 @@ export default function Header(props) {
                 className="flex items-center hover:cursor-pointer px-2 py-1"
                 onClick={() =>
                   (location.href =
-                    "/signin?redirectTo=" +
-                    encodeURIComponent(location.pathname))
+                    "/signin?next=" + encodeURIComponent(location.pathname))
                 }
               >
                 <img
@@ -286,7 +283,7 @@ export default function Header(props) {
               className="flex items-center hover:cursor-pointer px-2 py-1"
               onClick={() =>
                 (location.href =
-                  "/signin?redirectTo=" + encodeURIComponent(location.pathname))
+                  "/signin?next=" + encodeURIComponent(location.pathname))
               }
             >
               <img

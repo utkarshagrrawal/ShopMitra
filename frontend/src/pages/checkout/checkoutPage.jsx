@@ -118,7 +118,7 @@ export function CheckoutPage() {
     <Loader />
   ) : (
     <>
-      <Header redirectTo="/checkout" />
+      <Header next="/checkout" />
       <div className="grid lg:grid-cols-2 gap-8 mx-auto py-12 px-4 md:px-6 min-h-[70vh]">
         <div className="flex flex-col gap-4 space-y-6 border rounded-lg p-4 md:p-6 h-fit">
           {cartItems?.length > 0 &&

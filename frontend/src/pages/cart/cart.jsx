@@ -52,7 +52,7 @@ export function Cart() {
     <Loader />
   ) : (
     <div className="flex flex-col min-h-[100dvh]">
-      <Header redirectTo={"/cart"} />
+      <Header next={"/cart"} />
       {cartItems && cartItems.length > 0 ? (
         <main className="flex justify-center py-8 md:py-12 lg:py-16 min-h-[70vh]">
           <div className="container px-4 md:px-6">
