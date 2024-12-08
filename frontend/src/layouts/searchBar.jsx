@@ -41,7 +41,7 @@ export default function SearchBar(props) {
           ErrorAlert(data.error);
           return;
         }
-        setSearchResults(data.products);
+        setSearchResults(data.products || []);
       } catch (error) {
         if (error.name === "AbortError") return;
         ErrorAlert("An error occurred while fetching search results");
