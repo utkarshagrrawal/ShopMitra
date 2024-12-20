@@ -22,7 +22,7 @@ const loginController = async (req, res) => {
     };
     if (process.env.ENV === "production") {
       cookieOptions.secure = true;
-      cookieOptions.SameSite = "None";
+      cookieOptions.sameSite = "None";
     }
     res.cookie("token", user.token, cookieOptions);
     return res.status(200).json("Logged in successfully");

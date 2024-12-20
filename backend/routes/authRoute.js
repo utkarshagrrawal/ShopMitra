@@ -25,7 +25,7 @@ router.post("/logout", (req, res) => {
   };
   if (process.env.ENV === "production") {
     cookieOptions.secure = true;
-    cookieOptions.SameSite = "None";
+    cookieOptions.sameSite = "None";
   }
   res.cookie("token", "", cookieOptions);
   res.status(200).json({ message: "Logged out successfully" });

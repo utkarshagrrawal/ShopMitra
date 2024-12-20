@@ -26,7 +26,7 @@ const authenticate = async (req, res, next) => {
     };
     if (process.env.ENV === "production") {
       cookieOptions.secure = true;
-      cookieOptions.SameSite = "None";
+      cookieOptions.sameSite = "None";
     }
     res.cookie("token", "", cookieOptions);
     res.status(401).json({ error: "Please login to proceed" });
