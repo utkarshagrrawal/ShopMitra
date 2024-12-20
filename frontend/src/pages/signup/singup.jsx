@@ -21,24 +21,19 @@ export function Signup() {
 
   useEffect(() => {
     const isUserLoggedIn = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token,
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          localStorage.removeItem("token");
-        } else {
-          navigate("/");
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
         }
+      );
+      const data = await response.json();
+      if (!data.error) {
+        navigate("/");
       }
     };
     isUserLoggedIn();

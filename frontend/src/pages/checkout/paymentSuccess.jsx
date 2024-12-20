@@ -18,8 +18,8 @@ export function PaymentSuccess() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();

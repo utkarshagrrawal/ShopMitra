@@ -29,15 +29,14 @@ export function SearchResults() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.error) {
           ErrorAlert(data.error);
           if (data.error === "Please login to proceed") {
-            localStorage.removeItem("token");
             window.location.href = "/signin";
           }
           return;

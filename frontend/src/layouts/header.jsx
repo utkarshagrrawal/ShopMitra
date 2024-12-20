@@ -22,8 +22,24 @@ export default function Header(props) {
   };
 
   const handleLogout = async () => {
-    localStorage.removeItem("token");
-    setIsUserSignedIn(false);
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "auth/logout",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    const data = await response.json();
+    if (data.error) {
+      ErrorAlert(data.error || "An error occurred while logging out");
+      return;
+    } else {
+      window.location.href = "/";
+      setIsUserSignedIn(false);
+    }
   };
 
   useEffect(() => {
@@ -50,21 +66,19 @@ export default function Header(props) {
 
   useEffect(() => {
     const isUserLoggedIn = async () => {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: token,
           },
+          credentials: "include",
         }
       );
       const data = await response.json();
       if (data.error) {
         if (data.error === "Please login to proceed") {
-          localStorage.removeItem("token");
           props?.next &&
             (location.href = `/signin?next=${encodeURIComponent(props?.next)}`);
           return;
@@ -87,14 +101,13 @@ export default function Header(props) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.error) {
           if (data.error === "Please login to proceed") {
-            localStorage.removeItem("token");
             props?.next &&
               (location.href = `/signin?next=${encodeURIComponent(
                 props?.next

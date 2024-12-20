@@ -31,9 +31,9 @@ export default function SearchBar(props) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
             signal: abortController.signal,
+            credentials: "include",
           }
         );
         const data = await response.json();

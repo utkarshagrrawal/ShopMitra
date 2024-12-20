@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const {
   main: mongodbConnect,
   checkMongoDBConnection,
 } = require("./services/dbService");
+const { logRequests } = require("./middlewares/loggingMiddleware");
 
 mongodbConnect();
 
@@ -17,10 +20,12 @@ app.use(
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 app.use(express.json());
+app.use(cookieParser());
+app.use(logRequests);
 
 app.use((req, res, next) => {
   if (checkMongoDBConnection() !== 1) {

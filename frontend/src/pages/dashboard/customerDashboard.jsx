@@ -49,15 +49,12 @@ export function CustomerDashboard() {
         import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
         {
           method: "GET",
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
+          credentials: "include",
         }
       );
       const data = await response.json();
       if (data.error) {
         if (data.error === "Please login to proceed") {
-          localStorage.removeItem("token");
           ErrorAlert("You are not logged in. Please login to view this page.");
           window.location.href = "/";
         }
@@ -89,9 +86,7 @@ export function CustomerDashboard() {
         import.meta.env.VITE_BACKEND_URL + "user/wishlist?page=" + wishlistPage,
         {
           method: "GET",
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
+          credentials: "include",
         }
       );
       const data = await response.json();
@@ -117,9 +112,7 @@ export function CustomerDashboard() {
           import.meta.env.VITE_BACKEND_URL + "user/orders?page=" + orderPage,
           {
             method: "GET",
-            headers: {
-              Authorization: localStorage.getItem("token"),
-            },
+            credentials: "include",
           }
         );
         const data = await response.json();
@@ -172,8 +165,8 @@ export function CustomerDashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token"),
         },
+        credentials: "include",
         body: JSON.stringify(userProfileData),
       }
     );
@@ -204,8 +197,8 @@ export function CustomerDashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token"),
         },
+        credentials: "include",
         body: JSON.stringify(notificationPreferences),
       }
     );
@@ -261,8 +254,8 @@ export function CustomerDashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token"),
         },
+        credentials: "include",
         body: JSON.stringify(passwordData),
       }
     );

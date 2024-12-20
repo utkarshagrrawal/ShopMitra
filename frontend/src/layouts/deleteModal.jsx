@@ -17,9 +17,7 @@ export default function DeleteConfirmationModal(props) {
       import.meta.env.VITE_BACKEND_URL + "user/delete",
       {
         method: "DELETE",
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
+        credentials: "include",
       }
     );
     const data = await response.json();
@@ -29,7 +27,6 @@ export default function DeleteConfirmationModal(props) {
     if (data.error) {
       ErrorAlert(data.error);
     } else {
-      localStorage.clear();
       window.location.href = "/";
     }
   };

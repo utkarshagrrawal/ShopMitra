@@ -14,8 +14,8 @@ export function CartItemCard(props) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
         }
       );
       const data = await response.json();
@@ -49,8 +49,8 @@ export function CartItemCard(props) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
         }
       );
       const data = await response.json();
@@ -84,8 +84,8 @@ export function CartItemCard(props) {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
         }
       );
       const data = await response.json();

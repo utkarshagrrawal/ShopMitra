@@ -17,5 +17,19 @@ router.get("/is-logged-in", authenticate, userDetailsController);
 router.post("/forgot-password", generateOtpCode);
 router.post("/verify-otp", verifyOtpCode);
 router.post("/reset-password", resetPasswordController);
+router.post("/logout", (req, res) => {
+  let cookieOptions = {
+    maxAge: 0,
+    httpOnly: true,
+    path: "/",
+  };
+  if (process.env.ENV === "production") {
+    cookieOptions.secure = true;
+    cookieOptions.SameSite = "None";
+  }
+  res.cookie("token", "", cookieOptions);
+  res.status(200).json({ message: "Logged out successfully" });
+  return;
+});
 
 module.exports = router;

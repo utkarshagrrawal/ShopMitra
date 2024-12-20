@@ -45,6 +45,7 @@ export function Signin() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(loginDetails),
+        credentials: "include",
       }
     );
     const data = await response.json();
@@ -54,7 +55,6 @@ export function Signin() {
     if (data.error) {
       ErrorAlert(data.error);
     } else {
-      localStorage.setItem("token", data.token);
       if (params.get("next")) {
         navigate(decodeURIComponent(params.get("next")));
       } else {
@@ -65,24 +65,19 @@ export function Signin() {
 
   useEffect(() => {
     const isUserLoggedIn = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token,
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          localStorage.removeItem("token");
-        } else {
-          navigate("/");
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
         }
+      );
+      const data = await response.json();
+      if (!data.error) {
+        navigate("/");
       }
     };
     isUserLoggedIn();

@@ -40,6 +40,16 @@ const deleteUserController = async (req, res) => {
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
+  let cookieOptions = {
+    maxAge: 0,
+    httpOnly: true,
+    path: "/",
+  };
+  if (process.env.ENV === "production") {
+    cookieOptions.secure = true;
+    cookieOptions.SameSite = "None";
+  }
+  res.cookie("token", "", cookieOptions);
   return res.status(200).json({ message: response.message });
 };
 

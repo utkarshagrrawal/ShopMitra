@@ -17,9 +17,7 @@ export function SellerOrderDetails() {
           import.meta.env.VITE_BACKEND_URL + `seller/order/${orderId}`,
           {
             method: "GET",
-            headers: {
-              Authorization: localStorage.getItem("token"),
-            },
+            credentials: "include",
           }
         );
         const data = await response.json();

@@ -65,8 +65,8 @@ export function SellerProductDetails() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
           body: JSON.stringify(updatedProductDetails),
         }
       );
@@ -98,8 +98,8 @@ export function SellerProductDetails() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
           body: JSON.stringify({ stock: quantity }),
         }
       );

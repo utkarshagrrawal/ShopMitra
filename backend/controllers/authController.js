@@ -12,7 +12,20 @@ const loginController = async (req, res) => {
   if (user.error) {
     return res.status(401).json({ error: user.error });
   } else {
-    return res.status(200).json(user);
+    let cookieOptions = {
+      maxAge:
+        req.body.rememberMe === true
+          ? 7 * 24 * 60 * 60 * 1000
+          : 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      path: "/",
+    };
+    if (process.env.ENV === "production") {
+      cookieOptions.secure = true;
+      cookieOptions.SameSite = "None";
+    }
+    res.cookie("token", user.token, cookieOptions);
+    return res.status(200).json("Logged in successfully");
   }
 };
 

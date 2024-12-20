@@ -40,14 +40,13 @@ export function SellerDashboard() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.error) {
           if (data.error === "Please login to proceed") {
-            localStorage.removeItem("token");
             window.location.href =
               "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
@@ -81,14 +80,13 @@ export function SellerDashboard() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.error) {
           if (data.error === "Please login to proceed") {
-            localStorage.removeItem("token");
             window.location.href =
               "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
@@ -120,14 +118,13 @@ export function SellerDashboard() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.error) {
           if (data.error === "Please login to proceed") {
-            localStorage.removeItem("token");
             window.location.href =
               "/signin?next=" + encodeURIComponent(window.location.pathname);
             ErrorAlert("Please login to continue");
@@ -183,8 +180,8 @@ export function SellerDashboard() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
           body: JSON.stringify(newProduct),
         }
       );
@@ -192,7 +189,6 @@ export function SellerDashboard() {
       setAddingNewProduct(false);
       if (data.error) {
         if (data.error === "Please login to proceed") {
-          localStorage.removeItem("token");
           window.location.href =
             "/signin?next=" + encodeURIComponent(window.location.pathname);
           ErrorAlert("Please login to continue");

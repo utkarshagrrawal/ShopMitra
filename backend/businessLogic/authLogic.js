@@ -7,10 +7,12 @@ const {
   generateHashedPassword,
   jwtSign,
 } = require("../services/passportService");
-require("dotenv").config();
 
 const loginLogic = async (body) => {
   const { email, password, rememberMe } = body;
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
   const user = await User.find({ email, is_deleted: false });
   if (user.length === 0) {
     return { error: "User not found" };

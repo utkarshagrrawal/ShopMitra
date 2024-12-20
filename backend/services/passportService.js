@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
 
 const jwtSign = (payload, rememberMe) => {
   return jwt.sign(payload, process.env.APP_SECRET_KEY, {

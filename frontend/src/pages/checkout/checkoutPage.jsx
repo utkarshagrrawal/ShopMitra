@@ -24,8 +24,8 @@ export function CheckoutPage() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
@@ -51,8 +51,8 @@ export function CheckoutPage() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
@@ -87,8 +87,8 @@ export function CheckoutPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: localStorage.getItem("token"),
           },
+          credentials: "include",
           body: JSON.stringify({
             totalPrice: (subtotal + subtotal * 0.18).toFixed(2),
           }),
