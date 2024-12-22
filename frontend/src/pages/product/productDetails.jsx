@@ -197,7 +197,6 @@ export function ProductDetails() {
   }, [page]);
 
   const handleLikeProduct = async () => {
-    setLiked(!liked);
     const response = await fetch(
       import.meta.env.VITE_BACKEND_URL +
         "products/add-to-wishlist?productId=" +
@@ -212,9 +211,9 @@ export function ProductDetails() {
     );
     const data = await response.json();
     if (data.error) {
-      setLiked(!liked);
       ErrorAlert(data.error);
     } else {
+      setLiked((prev) => !prev);
       SuccessAlert(data.message);
     }
   };
