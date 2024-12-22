@@ -48,6 +48,7 @@ export default function SearchBar(props) {
       }
     };
     if (searchInputValue && searchInputValue.length >= 2) {
+      setSearchResults(null);
       clearTimeout(timeoutId.current);
       timeoutId.current = setTimeout(fetchResults, 1000);
     }
