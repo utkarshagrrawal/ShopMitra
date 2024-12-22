@@ -3,7 +3,7 @@ import { StarIcon } from "../../components/starIcon";
 
 export function Comments(props) {
   return (
-    <div className="flex flex-col w-full items-start bg-white border border-gray-200 rounded-lg shadow-lg mb-4 p-6 space-y-4">
+    <div className="flex flex-col w-full items-start bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-4">
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-4">
           <img
@@ -13,7 +13,14 @@ export function Comments(props) {
           />
           <div>
             <div className="font-bold text-lg">{props?.customerName}</div>
-            <div className="text-gray-500 text-sm">Verified Customer</div>
+            <div className="text-gray-500 text-sm flex items-center gap-2">
+              {[...Array(5)].map((_, index) => (
+                <StarIcon
+                  key={index}
+                  fill={index < props?.rating ? "#ffa41c" : "#e9ecef"}
+                />
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">

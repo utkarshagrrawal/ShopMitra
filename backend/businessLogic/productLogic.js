@@ -283,7 +283,19 @@ const fetchProductReviewsLogic = async (query, params) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * 5)
       .limit(5);
-    return { reviews };
+    const totalReviewsForThisProduct = await Review.countDocuments({
+      productId: id,
+    });
+    const averageRatingForThisProduct = await Review.aggregate([
+      { $match: { productId: id } },
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: "$rating" },
+        },
+      },
+    ]);
+    return { reviews, totalReviewsForThisProduct, averageRatingForThisProduct };
   } catch (error) {
     return { error: error };
   }

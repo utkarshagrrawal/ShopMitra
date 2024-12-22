@@ -115,7 +115,8 @@ export default function Header(props) {
           }
           return;
         }
-        setCartItemsQuantity(data.cart.length);
+        let actualCartItems = data.cart.filter((item) => item.quantity > 0);
+        setCartItemsQuantity(actualCartItems.length);
       } catch (error) {
         ErrorAlert("An error occurred while fetching cart items");
         console.log(error);

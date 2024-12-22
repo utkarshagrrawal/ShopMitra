@@ -6,7 +6,7 @@ export function StarIcon(props) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill={props?.fill}
-      className="size-5"
+      className={props?.className}
       stroke="currentColor"
     >
       <path

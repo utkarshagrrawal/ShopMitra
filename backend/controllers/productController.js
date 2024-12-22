@@ -17,12 +17,10 @@ const fetchProductsController = async (req, res) => {
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
-  return res
-    .status(200)
-    .json({
-      products: response.products,
-      totalProducts: response.totalProducts,
-    });
+  return res.status(200).json({
+    products: response.products,
+    totalProducts: response.totalProducts,
+  });
 };
 
 const addProductToWishlistController = async (req, res) => {
@@ -92,7 +90,12 @@ const fetchProductReviewsController = async (req, res) => {
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
-  return res.status(200).json({ reviews: response.reviews });
+  return res.status(200).json({
+    reviews: response.reviews,
+    totalReviewsForThisProduct: response.totalReviewsForThisProduct || 0,
+    averageRatingForThisProduct:
+      response.averageRatingForThisProduct[0]?.averageRating?.toFixed(2) || 0,
+  });
 };
 
 const addProductReviewController = async (req, res) => {
