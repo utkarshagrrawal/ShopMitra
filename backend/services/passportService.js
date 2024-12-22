@@ -7,12 +7,12 @@ const jwtSign = (payload, rememberMe) => {
   });
 };
 
-const generateSalt = async () => {
-  return await bcrypt.genSalt(16);
+const generateSalt = () => {
+  return bcrypt.genSaltSync();
 };
 
-const generateHashedPassword = async (password, salt) => {
-  return await bcrypt.hash(password, salt);
+const generateHashedPassword = (password, salt) => {
+  return bcrypt.hashSync(password, salt);
 };
 
 module.exports = {
