@@ -100,38 +100,12 @@ export function ProductDetails() {
         }
         setLoading(false);
         setProductDetails(data.product);
+        setLiked(data.isProductInWishlist);
       } catch (error) {
         console.log(error);
       }
     };
     fetchProductDetails();
-  }, []);
-
-  useEffect(() => {
-    const checkIsProductInWishlist = async () => {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + `products/is-in-wishlist/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          if (data.error !== "Please login to proceed") ErrorAlert(data.error);
-          return;
-        }
-        setLiked(data.isProductInWishlist);
-      } catch (error) {
-        ErrorAlert("An error occurred while fetching wishlist items");
-        console.log(error);
-      }
-    };
-    checkIsProductInWishlist();
   }, []);
 
   useEffect(() => {

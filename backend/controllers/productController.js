@@ -32,24 +32,15 @@ const addProductToWishlistController = async (req, res) => {
 };
 
 const fetchProductDetailsController = async (req, res) => {
-  const response = await fetchProductDetailsLogic(req.params);
-  if (response.error) {
-    return res.status(400).json({ error: response.error });
-  }
-  return res.status(200).json({
-    product: response.product,
-  });
-};
-
-const checkIsProductInWishlistController = async (req, res) => {
-  const response = await checkIsProductInWishlistLogic(
+  const response = await fetchProductDetailsLogic(
     req.params,
-    req.user.payload
+    req.user?.payload
   );
   if (response.error) {
     return res.status(400).json({ error: response.error });
   }
   return res.status(200).json({
+    product: response.product,
     isProductInWishlist: response.isProductInWishlist,
   });
 };
@@ -126,7 +117,6 @@ module.exports = {
   fetchProductsController,
   addProductToWishlistController,
   fetchProductDetailsController,
-  checkIsProductInWishlistController,
   addRemoveProductToCartController,
   removeItemFromCartController,
   checkoutController,

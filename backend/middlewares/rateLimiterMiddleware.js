@@ -12,7 +12,7 @@ const apiRequestLimiter = async (req, res, next) => {
     if (isIPLogged.expireAt < Date.now()) {
       await requestRateLimiter.updateOne(
         { ip },
-        { count: 20, expireAt: Date.now() + 1000 * 60 }
+        { count: 40, expireAt: Date.now() + 1000 * 60 }
       );
     } else if (isIPLogged.count <= 0) {
       return res.status(429).json({ error: "Too many requests" });
@@ -22,7 +22,7 @@ const apiRequestLimiter = async (req, res, next) => {
   } else {
     const requestRateControl = requestRateLimiter({
       ip,
-      count: 20,
+      count: 40,
       expireAt: Date.now() + 1000 * 60,
     });
     await requestRateControl.save();

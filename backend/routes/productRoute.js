@@ -9,7 +9,6 @@ const {
   checkoutController,
   addProductReviewController,
   fetchProductReviewsController,
-  checkIsProductInWishlistController,
   fetchCategoriesController,
   addProductController,
 } = require("../controllers/productController");
@@ -17,11 +16,6 @@ const router = express.Router();
 
 router.get("/search", fetchProductsController);
 router.get("/categories", authenticate, fetchCategoriesController);
-router.get(
-  "/is-in-wishlist/:id",
-  authenticate,
-  checkIsProductInWishlistController
-);
 router.get("/fetch-reviews/:id", fetchProductReviewsController);
 router.get("/:id", fetchProductDetailsController);
 
