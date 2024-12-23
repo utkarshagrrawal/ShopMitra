@@ -27,13 +27,15 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(logRequests);
-app.enable("trust proxy");
+app.set("trust proxy", 1);
 
 app.use(async (req, res, next) => {
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
-  let ip = req.ip;
+  let ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
+  console.log("IP: ", ip);
+  console.log("Headers: ", req.headers["x-forwarded-for"]);
   const isIPLogged = await requestRateLimiter.findOne({
     ip,
   });
