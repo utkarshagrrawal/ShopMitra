@@ -1,5 +1,4 @@
 import React from "react";
-import { Rating } from "../../components/rating";
 import { ErrorAlert, SuccessAlert } from "../../global/alerts";
 
 export function Product(props) {
@@ -48,14 +47,14 @@ export function Product(props) {
         <div className="p-4 flex flex-col justify-between">
           <div>
             <h2
-              className="text-md lg:text-xl font-bold mb-2 text-gray-800 hover:underline hover:cursor-pointer"
+              className="text-md lg:text-xl font-semibold mb-2 text-gray-800 hover:underline hover:cursor-pointer"
               onClick={() => (location.href = "/product/" + props.product?._id)}
             >
               {props.product.title}
             </h2>
             <div className="flex items-center mb-2 text-gray-600">
               <span className="text-lg mr-1">$</span>
-              <span className="text-2xl font-semibold text-gray-900">
+              <span className="text-lg font-semibold text-gray-900">
                 {props.product.price}
               </span>
             </div>
@@ -67,14 +66,6 @@ export function Product(props) {
                 </span>
               </div>
             )}
-          </div>
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center">
-              <Rating stars={props.product.stars} />
-              <span className="text-gray-600 text-sm ml-2">
-                ({props.product.reviews} reviews)
-              </span>
-            </div>
           </div>
           <div className="flex items-center justify-between mt-4">
             <button

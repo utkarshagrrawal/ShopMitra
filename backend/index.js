@@ -7,6 +7,7 @@ const {
   checkMongoDBConnection,
 } = require("./services/dbService");
 const { logRequests } = require("./middlewares/loggingMiddleware");
+const requestRateLimiter = require("./models/limiterModel");
 
 mongodbConnect();
 
@@ -26,6 +27,37 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(logRequests);
+app.enable("trust proxy");
+
+app.use(async (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  let ip = req.ip;
+  const isIPLogged = await requestRateLimiter.findOne({
+    ip,
+  });
+  if (isIPLogged) {
+    if (isIPLogged.count <= 0) {
+      return res.status(429).json({ error: "Too many requests" });
+    } else if (isIPLogged.expireAt < Date.now()) {
+      await requestRateLimiter.updateOne(
+        { ip },
+        { count: 20, expireAt: Date.now() + 1000 * 60 }
+      );
+    } else {
+      await requestRateLimiter.updateOne({ ip }, { $inc: { count: -1 } });
+    }
+  } else {
+    const requestRateControl = requestRateLimiter({
+      ip,
+      count: 20,
+      expireAt: Date.now() + 1000 * 60,
+    });
+    await requestRateControl.save();
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   if (checkMongoDBConnection() !== 1) {
