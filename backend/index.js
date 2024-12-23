@@ -34,19 +34,17 @@ app.use(async (req, res, next) => {
     return res.status(200).end();
   }
   let ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
-  console.log("IP: ", ip);
-  console.log("Headers: ", req.headers["x-forwarded-for"]);
   const isIPLogged = await requestRateLimiter.findOne({
     ip,
   });
   if (isIPLogged) {
-    if (isIPLogged.count <= 0) {
-      return res.status(429).json({ error: "Too many requests" });
-    } else if (isIPLogged.expireAt < Date.now()) {
+    if (isIPLogged.expireAt < Date.now()) {
       await requestRateLimiter.updateOne(
         { ip },
         { count: 20, expireAt: Date.now() + 1000 * 60 }
       );
+    } else if (isIPLogged.count <= 0) {
+      return res.status(429).json({ error: "Too many requests" });
     } else {
       await requestRateLimiter.updateOne({ ip }, { $inc: { count: -1 } });
     }
