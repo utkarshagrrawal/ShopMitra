@@ -8,6 +8,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { v4: uuidv4 } = require("uuid");
 const Review = require("../models/reviewModel");
 const { OrderedProducts } = require("../models/orderedProducts");
+const { default: mongoose } = require("mongoose");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
@@ -27,7 +28,7 @@ const fetchProductsLogic = async (query) => {
 
     return { products, totalProducts };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -62,7 +63,7 @@ const addProductToWishlistLogic = async (query, user) => {
       return { message: "Product added to wishlist" };
     }
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -76,7 +77,7 @@ const fetchProductDetailsLogic = async (params, user) => {
     });
     return { product, isProductInWishlist: isProductInWishlist ? true : false };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -85,27 +86,35 @@ const addRemoveProductToCartLogic = async (query, user) => {
   const { email } = user;
 
   try {
+    const isProductInCart = await Cart.findOne({
+      email: email,
+      products: { $elemMatch: { product: productId } },
+    });
     if (operationType === "add") {
-      const isCartExists = await Cart.findOne({ email: email });
-      if (!isCartExists) {
+      const doesCartExists = await Cart.findOne({ email: email });
+      const doesThisProductExists = await Product.findById(productId);
+      if (!doesThisProductExists) {
+        return { error: "Product not found" };
+      }
+      if (!doesCartExists) {
         await Cart.create({
           email: email,
           products: [{ product: productId, quantity: 1 }],
         });
         return { message: "Product added to cart", quantity: 1 };
       }
-      const isProductInCart = await Cart.findOne({
-        email: email,
-        products: { $elemMatch: { product: productId } },
-      });
       if (isProductInCart) {
+        const productCurrentQuantity =
+          isProductInCart.products.filter((product) => {
+            return product.product.toHexString() === productId;
+          })[0]?.quantity || 0;
         await Cart.updateOne(
           { email: email, products: { $elemMatch: { product: productId } } },
           { $inc: { "products.$.quantity": 1 } }
         );
         return {
           message: "Product added to cart",
-          quantity: isProductInCart.products[0].quantity + 1,
+          quantity: productCurrentQuantity + 1,
         };
       } else {
         await Cart.updateOne(
@@ -115,25 +124,33 @@ const addRemoveProductToCartLogic = async (query, user) => {
         return { message: "Product added to cart", quantity: 1 };
       }
     } else {
-      const isProductInCart = await Cart.findOne({
-        email: email,
-        products: { $elemMatch: { product: productId } },
-      });
-      if (isProductInCart && isProductInCart.products[0].quantity >= 1) {
+      if (!isProductInCart) {
+        return { message: "Product not in cart", quantity: 0 };
+      }
+      const productToBeRemoved = isProductInCart.products.filter(
+        (product) => product.product.toHexString() === productId
+      )[0];
+      if (productToBeRemoved.quantity > 1) {
         await Cart.updateOne(
           { email: email, products: { $elemMatch: { product: productId } } },
           { $inc: { "products.$.quantity": -1 } }
         );
         return {
           message: "Product removed from cart",
-          quantity: isProductInCart.products[0].quantity - 1,
+          quantity: productToBeRemoved.quantity - 1,
         };
+      } else if (productToBeRemoved.quantity === 1) {
+        await Cart.updateOne(
+          { email: email, products: { $elemMatch: { product: productId } } },
+          { $pull: { products: { product: productId } } }
+        );
+        return { message: "Product removed from cart", quantity: 0 };
       } else {
         return { message: "Product not in cart", quantity: 0 };
       }
     }
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -156,7 +173,7 @@ const removeItemFromCartLogic = async (query, user) => {
       return { message: "Product not in cart" };
     }
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -205,9 +222,13 @@ const checkoutLogic = async (user, body) => {
     if (isStockAvailable.includes(false)) {
       return { error: "Stock not available" };
     }
-
+    let cartItems = cart.products;
+    if (cartItems && cartItems.length === 0) {
+      return { error: "Cart is empty" };
+    }
+    cartItems = cartItems.filter((item) => item.quantity > 0);
     const lineItems = await Promise.all(
-      cart.products.map(async (product) => {
+      cartItems.map(async (product) => {
         const productDetails = await Product.findById(product.product);
         return {
           price_data: {
@@ -261,7 +282,7 @@ const checkoutLogic = async (user, body) => {
     return { sessionId: session.id };
   } catch (error) {
     console.log(error);
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -287,7 +308,7 @@ const fetchProductReviewsLogic = async (query, params) => {
     ]);
     return { reviews, totalReviewsForThisProduct, averageRatingForThisProduct };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -329,7 +350,7 @@ const addProductReviewLogic = async (user, body) => {
     }
     return { message: "Review added successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -338,7 +359,7 @@ const fetchCategoriesLogic = async () => {
     const categories = await Category.find().sort({ category_name: 1 });
     return { categories };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -381,7 +402,7 @@ const addProductLogic = async (body, user) => {
     }
     return { message: "Product added successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 

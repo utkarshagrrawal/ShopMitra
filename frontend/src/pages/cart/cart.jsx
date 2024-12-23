@@ -42,9 +42,11 @@ export function Cart() {
 
   useEffect(() => {
     let total = 0;
-    cartItems.forEach((item) => {
-      total += item.price * item.quantity;
-    });
+    if (cartItems && cartItems.length > 0) {
+      cartItems.forEach((item) => {
+        total += item.price * item.quantity;
+      });
+    }
     setTotalAmount(total);
   }, [cartItems]);
 

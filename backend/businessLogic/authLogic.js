@@ -19,7 +19,7 @@ const loginLogic = async (body) => {
   }
   let hashedPassword;
   try {
-    hashedPassword = await generateHashedPassword(password, user[0].hash_code);
+    hashedPassword = generateHashedPassword(password, user[0].hash_code);
   } catch (err) {
     return { error: err.message };
   }
@@ -40,8 +40,8 @@ const registerLogic = async (body) => {
   if (user.length > 0) {
     return { error: "User already exists" };
   }
-  const salt = await generateSalt();
-  const hashedPassword = await generateHashedPassword(password, salt);
+  const salt = generateSalt();
+  const hashedPassword = generateHashedPassword(password, salt);
   const newUser = new User({
     name,
     email,
@@ -209,8 +209,8 @@ const resetPasswordLogic = async (body) => {
     return { error: "Passwords do not match" };
   }
   try {
-    const salt = await generateSalt();
-    const hashedPassword = await generateHashedPassword(password, salt);
+    const salt = generateSalt();
+    const hashedPassword = generateHashedPassword(password, salt);
     await User.updateOne(
       { email },
       { password: hashedPassword, hash_code: salt }

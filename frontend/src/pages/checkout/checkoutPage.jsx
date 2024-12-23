@@ -121,30 +121,34 @@ export function CheckoutPage() {
       <div className="grid lg:grid-cols-2 gap-8 mx-auto py-12 px-4 md:px-6 min-h-[70vh]">
         <div className="flex flex-col gap-4 space-y-6 border rounded-lg p-4 md:p-6 h-fit">
           {cartItems?.length > 0 &&
-            cartItems.map((item) => (
-              <div
-                key={item._id}
-                className="flex items-center gap-4 bg-white rounded-lg"
-              >
-                <img
-                  src={item.imgUrl}
-                  alt={item.title}
-                  className="h-24 w-24 object-contain rounded-lg"
-                />
-                <div className="flex flex-col">
-                  <h2 className="text-xl font-bold text-gray-800">
-                    {item.title}
-                  </h2>
-                  <p className="text-gray-500">
-                    Unit Price: ${item.price.toFixed(2)}
-                  </p>
-                  <p className="text-gray-500">Quantity: {item.quantity}</p>
-                  <p className="text-gray-700 font-semibold">
-                    Total: ${(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            ))}
+            cartItems.map((item) => {
+              return (
+                item.quantity > 0 && (
+                  <div
+                    key={item._id}
+                    className="flex items-center gap-4 bg-white rounded-lg"
+                  >
+                    <img
+                      src={item.imgUrl}
+                      alt={item.title}
+                      className="h-24 w-24 object-contain rounded-lg"
+                    />
+                    <div className="flex flex-col">
+                      <h2 className="text-xl font-bold text-gray-800">
+                        {item.title}
+                      </h2>
+                      <p className="text-gray-500">
+                        Unit Price: ${item.price.toFixed(2)}
+                      </p>
+                      <p className="text-gray-500">Quantity: {item.quantity}</p>
+                      <p className="text-gray-700 font-semibold">
+                        Total: ${(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                )
+              );
+            })}
         </div>
         <div className="flex flex-col">
           <div className="bg-white rounded-lg p-4 md:p-6 border">
