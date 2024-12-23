@@ -3,19 +3,22 @@ import WarningIcon from "../../components/warningIcon";
 
 export function FallbackPage() {
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-md text-center">
-        <WarningIcon className="mx-auto h-12 w-12 text-primary" />
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Oops, something went wrong!
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-lg text-center">
+        <WarningIcon className="mx-auto h-16 w-16 text-red-500" />
+        <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+          Oops! Something went wrong.
         </h1>
-        <p className="mt-4 text-muted-foreground">
+        <p className="mt-4 text-gray-600 text-lg">
           We're sorry, but an unexpected error has occurred on our end. Please
-          try again later or contact our support team at{" "}
+          try again later or reach out to our support team.
+        </p>
+        <p className="mt-2 text-gray-600 text-base">
+          Contact us at{" "}
           <a href="tel:+916350555537" className="text-blue-600 underline">
             +91 63505 55537
           </a>{" "}
-          or at{" "}
+          or via email at
           <a
             href="mailto:utkarshagrawal09jan@gmail.com"
             className="text-blue-600 underline"
@@ -27,9 +30,9 @@ export function FallbackPage() {
         <div className="mt-6">
           <a
             href="/"
-            className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+            className="inline-flex items-center rounded-md bg-blue-600 text-white px-5 py-3 text-base font-medium shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Go to Homepage
+            Return to Homepage
           </a>
         </div>
       </div>
