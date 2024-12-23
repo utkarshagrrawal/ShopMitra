@@ -46,7 +46,7 @@ export function CheckoutPage() {
     const isUserSeller = async () => {
       try {
         const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+          import.meta.env.VITE_BACKEND_URL + "auth/current-user",
           {
             method: "GET",
             headers: {

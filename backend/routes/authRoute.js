@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/login", loginController);
 router.post("/register", registerController);
-router.get("/is-logged-in", authenticate, userDetailsController);
+router.get("/current-user", authenticate, userDetailsController);
 router.post("/forgot-password", generateOtpCode);
 router.post("/verify-otp", verifyOtpCode);
 router.post("/reset-password", resetPasswordController);

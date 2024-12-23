@@ -67,7 +67,7 @@ export default function Header(props) {
   useEffect(() => {
     const isUserLoggedIn = async () => {
       const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "auth/is-logged-in",
+        import.meta.env.VITE_BACKEND_URL + "auth/current-user",
         {
           method: "GET",
           headers: {
