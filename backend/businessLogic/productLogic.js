@@ -108,6 +108,9 @@ const addRemoveProductToCartLogic = async (query, user) => {
           isProductInCart.products.filter((product) => {
             return product.product.toHexString() === productId;
           })[0]?.quantity || 0;
+        if (doesThisProductExists.stock < productCurrentQuantity + 1) {
+          return { error: "Stock not available" };
+        }
         await Cart.updateOne(
           { email: email, products: { $elemMatch: { product: productId } } },
           { $inc: { "products.$.quantity": 1 } }
@@ -117,6 +120,9 @@ const addRemoveProductToCartLogic = async (query, user) => {
           quantity: productCurrentQuantity + 1,
         };
       } else {
+        if (doesThisProductExists.stock < 1) {
+          return { error: "Stock not available" };
+        }
         await Cart.updateOne(
           { email: email },
           { $push: { products: { product: productId, quantity: 1 } } }
