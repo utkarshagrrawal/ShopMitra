@@ -1,4 +1,4 @@
-const otpModel = require("../models/otpModel");
+const OTP = require("../models/otpModel");
 const { User } = require("../models/userModel");
 const { sendEmail } = require("../services/emailService");
 const generateOtp = require("../services/otpService");
@@ -112,11 +112,8 @@ const generateOtpCodeLogic = async (body) => {
     return { error: "User not found" };
   }
   try {
-    await otpModel.deleteMany({
-      email,
-      expiry: { $lt: new Date(Date.now() - 15 * 60 * 1000) },
-    });
-    let previousOtp = await otpModel.findOne({ email });
+    await OTP.deleteMany({ expiry: { $lt: Date.now() } });
+    let previousOtp = await OTP.findOne({ email });
     if (previousOtp) {
       sendEmail(
         email,
@@ -144,13 +141,11 @@ const generateOtpCodeLogic = async (body) => {
       );
     } else {
       const otp = generateOtp();
-      await otpModel.insertMany([
-        {
-          email: email,
-          otp: otp,
-          expiry: new Date(),
-        },
-      ]);
+      await OTP.create({
+        email: email,
+        otp: otp,
+        expiry: Date.now() + 1000 * 60 * 15,
+      });
       sendEmail(
         email,
         "Password Reset Request for shopmitra",
@@ -183,20 +178,17 @@ const generateOtpCodeLogic = async (body) => {
 };
 
 const verifyOtpLogic = async (body) => {
-  const { email, otp } = body;
+  const { email, otp: userEnteredOTP } = body;
   try {
-    await otpModel.deleteMany({
-      email,
-      expiry: { $lt: new Date(Date.now() - 15 * 60 * 1000) },
-    });
-    const otps = await otpModel.findOne({ email });
-    if (otps && otps.length === 0) {
+    await OTP.deleteMany({ expiry: { $lt: Date.now() } });
+    const retrievedOTP = await OTP.findOne({ email });
+    if (!retrievedOTP) {
       return { error: "OTP has been expired" };
     }
-    if (otps.otp !== otp) {
+    if (retrievedOTP.otp !== userEnteredOTP) {
       return { error: "Invalid OTP" };
     }
-    await otpModel.deleteMany({ email });
+    await OTP.deleteMany({ email });
   } catch (err) {
     return { error: err.toString() };
   }

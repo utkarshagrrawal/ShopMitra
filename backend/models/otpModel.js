@@ -10,11 +10,11 @@ const otpSchema = new mongoose.Schema({
     required: true,
   },
   expiry: {
-    type: Date,
+    type: Number,
     required: true,
   },
 });
 
-const otpModel = mongoose.model("otp", otpSchema);
+const OTP = mongoose.model("otp", otpSchema);
 
-module.exports = otpModel;
+module.exports = OTP;

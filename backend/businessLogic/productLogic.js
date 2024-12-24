@@ -5,10 +5,8 @@ const { Cart } = require("../models/cartModel");
 const { Order } = require("../models/orderModel");
 const { Category } = require("../models/categoryModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { v4: uuidv4 } = require("uuid");
 const Review = require("../models/reviewModel");
 const { OrderedProducts } = require("../models/orderedProducts");
-const { default: mongoose } = require("mongoose");
 
 const fetchProductsLogic = async (query) => {
   const { q, page } = query;
