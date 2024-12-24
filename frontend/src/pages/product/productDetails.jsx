@@ -381,8 +381,8 @@ export function ProductDetails() {
             <div className="flex items-center gap-2">
               <StarIcon className="text-white size-5" fill="#facc15" />
               <span className="text-md text-gray-600">
-                {averageRating ? averageRating : "0"} out of 5 (
-                {totalReviews || 0} reviews)
+                {averageRating ? averageRating : "0"}/5.00 ({totalReviews || 0}{" "}
+                reviews)
               </span>
             </div>
             <div className="flex gap-2 items-center">
