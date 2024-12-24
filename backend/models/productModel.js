@@ -57,11 +57,11 @@ const product = new mongoose.Schema({
     default: 0,
   },
   totalCost: {
-    type: String,
+    type: Number,
     default: 0,
   },
   totalEarnings: {
-    type: String,
+    type: Number,
     default: 0,
   },
   sellerId: {

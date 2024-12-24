@@ -16,7 +16,7 @@ const cancelOrderDueToPaymentFailureLogic = async (query) => {
     await Order.deleteMany({ orderId });
     return { message: "Order cancelled" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -27,34 +27,25 @@ const processOrderLogic = async (query) => {
     if (!order) {
       return { error: "Order not found" };
     }
-    const updateOrderStatus = await Order.updateOne(
-      { orderId },
-      { status: "processed" }
-    );
-    const allProductsInOrder = order.products;
+    const orderedProducts = await OrderedProducts.find({ orderId });
+    await Order.updateOne({ orderId }, { status: "processed" });
     await Promise.all(
-      allProductsInOrder.map(async (product) => {
+      orderedProducts.map(async (item) => {
         await Product.updateOne(
-          { _id: product.product },
+          { _id: item.product },
           {
-            $inc: { stock: -product.quantity },
-            $inc: { totalBought: product.quantity },
-            $inc: { totalCost: product.quantity * product.price },
-            $inc: { totalEarnings: product.quantity * product.price },
+            $inc: { stock: -1 * item.quantity },
+            $inc: { totalBought: item.quantity },
+            $inc: { totalCost: item.quantity * item.price },
+            $inc: { totalEarnings: item.quantity * item.price },
           }
         );
       })
     );
-    if (
-      updateOrderStatus.matchedCount === 0 ||
-      updateOrderStatus.modifiedCount === 0
-    ) {
-      return { error: "Order status not updated" };
-    }
     await Cart.updateOne({ email: order.email }, { $set: { products: [] } });
     return { message: "Order found" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -80,7 +71,7 @@ const fetchOrderDetailsLogic = async (params) => {
     );
     return { order: order, orderDetails: orderDetails };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 

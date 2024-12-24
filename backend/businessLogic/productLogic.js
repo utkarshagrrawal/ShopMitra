@@ -37,8 +37,8 @@ const addProductToWishlistLogic = async (query, user) => {
   const { email } = user;
 
   try {
-    const isWishlistExists = await Wishlist.findOne({ email: email });
-    if (!isWishlistExists) {
+    const doesWishlistExists = await Wishlist.findOne({ email: email });
+    if (!doesWishlistExists) {
       await Wishlist.create({
         email: email,
         products: [{ product: productId }],
@@ -169,7 +169,7 @@ const removeItemFromCartLogic = async (query, user) => {
       email: email,
       products: { $elemMatch: { product: productId } },
     });
-    if (isProductInCart && isProductInCart.products[0].quantity >= 1) {
+    if (isProductInCart) {
       await Cart.updateOne(
         { email: email, products: { $elemMatch: { product: productId } } },
         { $pull: { products: { product: productId } } }
@@ -192,7 +192,13 @@ const isOrderIdDuplicate = async (orderId) => {
 };
 
 const createOrderId = async () => {
-  let orderId = uuidv4();
+  let characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let orderId = "";
+  for (let i = 0; i < 12; i++) {
+    orderId += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  orderId += "-" + Date.now();
   if (await isOrderIdDuplicate(orderId)) {
     return createOrderId();
   }
@@ -210,32 +216,12 @@ const checkoutLogic = async (user, body) => {
     } else if (cart.products.length === 0) {
       return { error: "Cart is empty" };
     }
-
-    const isStockAvailable = await Promise.all(
-      cart.products.map(async (product) => {
-        const productDetails = await Product.findOne({
-          _id: product.product,
-        });
-        if (!productDetails) {
-          return false;
-        }
-        if (productDetails.stock < product.quantity) {
-          return false;
-        }
-        return true;
-      })
-    );
-    if (isStockAvailable.includes(false)) {
-      return { error: "Stock not available" };
-    }
-    let cartItems = cart.products;
-    if (cartItems && cartItems.length === 0) {
-      return { error: "Cart is empty" };
-    }
-    cartItems = cartItems.filter((item) => item.quantity > 0);
     const lineItems = await Promise.all(
-      cartItems.map(async (product) => {
-        const productDetails = await Product.findById(product.product);
+      cart.products.map(async (item) => {
+        const productDetails = await Product.findById(item.product);
+        if (productDetails.stock < item.quantity) {
+          return false;
+        }
         return {
           price_data: {
             currency: "usd",
@@ -248,10 +234,13 @@ const checkoutLogic = async (user, body) => {
               Number(productDetails.price) * 0.18 * 100
             ).toFixed(0),
           },
-          quantity: product.quantity,
+          quantity: item.quantity,
         };
       })
     );
+    if (lineItems.includes(false)) {
+      return { error: "Stock not available" };
+    }
     let orderId = await createOrderId();
     const order = await Order.create({
       orderId,
@@ -287,7 +276,6 @@ const checkoutLogic = async (user, body) => {
     });
     return { sessionId: session.id };
   } catch (error) {
-    console.log(error);
     return { error: error.toString() };
   }
 };
@@ -318,40 +306,22 @@ const fetchProductReviewsLogic = async (query, params) => {
   }
 };
 
-const isReviewIdDuplicate = async (reviewId) => {
-  const review = await Review.findOne({ reviewId });
-  if (review) {
-    return true;
-  }
-  return false;
-};
-
-const createReviewId = async () => {
-  let reviewId = uuidv4();
-  if (await isReviewIdDuplicate(reviewId)) {
-    return createReviewId();
-  }
-  return reviewId;
-};
-
 const addProductReviewLogic = async (user, body) => {
   const { email } = user;
   const { productId, rating, review } = body;
   try {
-    const reviewId = await createReviewId();
     const userDetails = await User.findOne({ email, is_deleted: false }).lean();
     if (!userDetails) {
       return { error: "User not found" };
     }
-    const reviewEntry = await Review.create({
+    const createdReview = await Review.create({
       name: userDetails.name,
       email,
-      reviewId,
       productId,
       rating,
       review,
     });
-    if (!reviewEntry) {
+    if (!createdReview) {
       return { error: "An error occurred while adding review" };
     }
     return { message: "Review added successfully" };
