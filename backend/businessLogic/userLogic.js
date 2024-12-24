@@ -33,7 +33,7 @@ const updateProfileLogic = async (body) => {
     );
     return { message: "Profile updated successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -61,7 +61,7 @@ const changeUserPasswordLogic = async (body, user) => {
     );
     return { message: "Password updated successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -76,7 +76,7 @@ const notificationPreferencesUpdateLogic = async (body, user) => {
     );
     return { message: "Notification preferences updated successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -85,7 +85,7 @@ const deleteUserLogic = async (user) => {
     await User.updateOne({ email: user.email }, { is_deleted: true });
     return { message: "User deleted successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -113,7 +113,7 @@ const fetchUserWislistLogic = async (user, query) => {
     }
     return { wishlist: products, totalProducts };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -134,7 +134,7 @@ const fetchUserCartLogic = async (user) => {
     }
     return { cart: products };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -168,7 +168,7 @@ const fetchUserOrdersLogic = async (user, query) => {
     );
     return { orders: orderDetails, totalOrders };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 

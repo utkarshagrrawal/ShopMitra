@@ -26,7 +26,7 @@ const fetchSellerDataLogic = async (user, query) => {
       .limit(10);
     return { sellerDetails, sellerProducts, totalSellerProducts };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -46,7 +46,7 @@ const fetchSellerOrdersLogic = async (user) => {
     });
     return { totalSellerOrders };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -72,7 +72,7 @@ const updateProductDetailsLogic = async (body, user, params) => {
     }
     return { message: "Product updated successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -98,7 +98,7 @@ const addStockLogic = async (body, user, params) => {
     }
     return { message: "Stock updated successfully" };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 
@@ -134,7 +134,7 @@ const fetchProductsInOrderLogic = async (user, params) => {
     );
     return { productsInOrder: products };
   } catch (error) {
-    return { error: error };
+    return { error: error.toString() };
   }
 };
 

@@ -30,7 +30,7 @@ const loginLogic = async (body) => {
     const token = jwtSign({ email }, rememberMe);
     return { token };
   } catch (err) {
-    return { error: err.message };
+    return { error: err.toString() };
   }
 };
 
@@ -81,7 +81,7 @@ const registerLogic = async (body) => {
     );
     return { message: "User registered successfully" };
   } catch (error) {
-    return { error: error.message };
+    return { error: error.toString() };
   }
 };
 
@@ -101,7 +101,7 @@ const userDetailsLogic = async (user) => {
       },
     };
   } catch (error) {
-    return { error: error.message };
+    return { error: error.toString() };
   }
 };
 
@@ -177,7 +177,7 @@ const generateOtpCodeLogic = async (body) => {
       );
     }
   } catch (err) {
-    return { error: err.message };
+    return { error: err.toString() };
   }
   return { success: true };
 };
@@ -198,7 +198,7 @@ const verifyOtpLogic = async (body) => {
     }
     await otpModel.deleteMany({ email });
   } catch (err) {
-    return { error: err.message };
+    return { error: err.toString() };
   }
   return { message: "OTP verified successfully" };
 };
@@ -217,7 +217,7 @@ const resetPasswordLogic = async (body) => {
     );
     return { message: "Password changed successfully" };
   } catch (err) {
-    return { error: err.message };
+    return { error: err.toString() };
   }
 };
 
