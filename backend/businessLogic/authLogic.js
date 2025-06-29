@@ -69,7 +69,7 @@ const registerLogic = async (body) => {
                 You can now explore our wide range of products and enjoy exclusive member benefits. Start shopping today and make the most of your experience with us!
             </p>
             <p style="font-size: 16px; color: #555;">
-                If you have any questions or need assistance, feel free to contact our support team at <a href="mailto:utkarsh09jan@gmail.com" style="color: #3498db;">utkarsh09jan@gmail.com</a>.
+                If you have any questions or need assistance, feel free to contact our support team at <a href="mailto:utkarshagrawal09jan@gmail.com" style="color: #3498db;">utkarshagrawal09jan@gmail.com</a>.
             </p>
             <p style="font-size: 16px; color: #555;">Happy shopping!</p>
             <p style="font-size: 16px; color: #555; text-align: center;">Best Regards,<br>The Shopmitra Team</p>
