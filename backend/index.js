@@ -42,6 +42,6 @@ app.use("/products", require("./routes/productRoute"));
 app.use("/orders", require("./routes/orderRoute"));
 app.use("/seller", require("./routes/sellerRoute"));
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
