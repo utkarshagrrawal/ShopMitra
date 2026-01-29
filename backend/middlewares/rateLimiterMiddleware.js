@@ -34,7 +34,7 @@ const apiRequestLimiter = async (req, res, next) => {
       {
         count: 100,
         expireAt: now + 1000 * 60,
-        exponentialBackoff: isIPLogged.exponentialBackoff,
+        exponentialBackoff: 1,
         lastHitAt: now,
         HitsAfterLimitReached: 0,
       }
